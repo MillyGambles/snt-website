@@ -693,7 +693,7 @@ function savePts(uid){
   fetch(API+'/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:v})})
   .then(function(){
     var u=D.users.find(function(u){return u.id===uid;});
-    if(u){u.pts=v;u.inv=Math.round(v/10);}
+    if(u){u.pts=v;}
     rUsTbl();
     rLB();
     toast('Points updated!');
