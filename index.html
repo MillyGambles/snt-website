@@ -199,7 +199,7 @@ h1 .hi{color:var(--accent);}
     <button class="tab on" onclick="go('lb',this)">Leaderboard</button>
     <button class="tab" onclick="go('ev',this)">Events</button>
     <button class="tab" onclick="go('sh',this)">Shop</button>
-    <button class="tab" onclick="go('adm',this)">Admin</button>
+    <button class="tab" onclick="goAdmin(this)">Admin</button>
   </div>
   <div class="nav-r">
     <button class="btn btn-blue" onclick="window.location.href='https://snt-backend-production.up.railway.app/auth/discord'" id="login-btn">Login with Discord</button>
@@ -377,6 +377,19 @@ h1 .hi{color:var(--accent);}
 
 <script>
   var API = 'https://snt-backend-production.up.railway.app/api';
+  function goAdmin(btn){
+  if(!adminUnlocked){
+    var pw = prompt('Enter admin password:');
+    if(pw === 'your_password_here'){
+      adminUnlocked = true;
+      go('adm', btn);
+    } else {
+      toast('Wrong password!','err');
+    }
+  } else {
+    go('adm', btn);
+  }
+}
 var D = {
   users:[
     {id:'1',name:'KaizenUGC',pts:1420,inv:142},
@@ -420,6 +433,18 @@ function go(id,btn,mob){
   if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();}
 }
 
+var adminUnlocked = false;
+
+function unlockAdmin(){
+  var pw = prompt('Enter admin password:');
+  if(pw === 'Milly'){
+    adminUnlocked = true;
+    document.getElementById('pg-adm').style.display='block';
+    toast('Admin unlocked!');
+  } else {
+    toast('Wrong password!','err');
+  }
+}
 function adm(id,btn){
   document.querySelectorAll('.adm-panel').forEach(function(p){p.classList.remove('on');});
   document.querySelectorAll('.adm-btn').forEach(function(b){b.classList.remove('on');});
