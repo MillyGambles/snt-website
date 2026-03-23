@@ -652,9 +652,12 @@ function togItem(id,v){
 
 function delItem(id){
   if(!confirm('Remove this item?')) return;
-  D.items=D.items.filter(function(i){return i.id!==id;});
-  rShTbl();
-  toast('Item removed.');
+  fetch(API+'/shop/'+id,{method:'DELETE'})
+  .then(function(){
+    D.items=D.items.filter(function(i){return i.id!==id;});
+    rShTbl();
+    toast('Item removed.');
+  }).catch(function(){toast('Failed!','err');});
 }
 
 function addEvent(){
@@ -676,9 +679,12 @@ function addEvent(){
 
 function delEvent(id){
   if(!confirm('Remove this event?')) return;
-  D.events=D.events.filter(function(e){return e.id!==id;});
-  rEvTbl();
-  toast('Event removed.');
+  fetch(API+'/events/'+id,{method:'DELETE'})
+  .then(function(){
+    D.events=D.events.filter(function(e){return e.id!==id;});
+    rEvTbl();
+    toast('Event removed.');
+  }).catch(function(){toast('Failed!','err');});
 }
 
 function savePts(uid){
