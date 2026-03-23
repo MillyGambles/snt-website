@@ -219,7 +219,7 @@ h1 .hi{color:var(--accent);}
   <button class="mob-tab on" onclick="go('lb',this,1)">Leaderboard</button>
   <button class="mob-tab" onclick="go('ev',this,1)">Events</button>
   <button class="mob-tab" onclick="go('sh',this,1)">Shop</button>
-  <button class="mob-tab" onclick="go('adm',this,1)">Admin</button>
+  <button class="mob-tab" onclick="goAdminMob(this)">Admin</button>
 </div>
 
 <div class="pg on" id="pg-lb">
@@ -380,14 +380,27 @@ h1 .hi{color:var(--accent);}
   function goAdmin(btn){
   if(!adminUnlocked){
     var pw = prompt('Enter admin password:');
-    if(pw === 'your_password_here'){
-      adminUnlocked = true;
+    if(pw === 'Milly'){
+      adminUnlocked = false;
       go('adm', btn);
     } else {
       toast('Wrong password!','err');
     }
   } else {
     go('adm', btn);
+  }
+}
+function goAdminMob(btn){
+  if(!adminUnlocked){
+    var pw = prompt('Enter admin password:');
+    if(pw === 'Milly'){
+      adminUnlocked = false;
+      go('adm', btn, 1);
+    } else {
+      toast('Wrong password!','err');
+    }
+  } else {
+    go('adm', btn, 1);
   }
 }
 var D = {
