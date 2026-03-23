@@ -633,12 +633,15 @@ function addItem(){
   var c=parseInt(document.getElementById('a-cost').value);
   var d=document.getElementById('a-desc').value.trim();
   var s=parseInt(document.getElementById('a-stock').value);
-  var ic=document.getElementById('a-icon').value.trim()||'🎁';
+  var ic=document.getElementById('a-icon').value.trim()||'';
   if(!n||isNaN(c)){toast('Fill in name and cost!','err');return;}
-  D.items.push({id:Date.now(),name:n,cost:c,desc:d,stock:isNaN(s)?-1:s,icon:ic,active:true});
-  ['a-name','a-cost','a-desc','a-stock','a-icon'].forEach(function(x){document.getElementById(x).value='';});
-  rShTbl();
-  toast(n+' added to shop!');
+  fetch(API+'/shop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,description:d,cost:c,stock:isNaN(s)?-1:s,icon:ic})})
+  .then(function(){
+    D.items.push({id:Date.now(),name:n,cost:c,desc:d,stock:isNaN(s)?-1:s,icon:ic,active:true});
+    ['a-name','a-cost','a-desc','a-stock','a-icon'].forEach(function(x){document.getElementById(x).value='';});
+    rShTbl();
+    toast(n+' added to shop!');
+  }).catch(function(){toast('Failed to save!','err');});
 }
 
 function togItem(id,v){
@@ -662,10 +665,13 @@ function addEvent(){
   var pr=document.getElementById('e-prizes').value.trim();
   var prizes=pr?pr.split(',').map(function(p){return p.trim();}).filter(Boolean):[];
   if(!t){toast('Fill in event title!','err');return;}
-  D.events.unshift({id:Date.now(),title:t,status:st,desc:d,date:dt,prizes:prizes});
-  ['e-title','e-desc','e-date','e-prizes'].forEach(function(x){document.getElementById(x).value='';});
-  rEvTbl();
-  toast('Event "'+t+'" added!');
+  fetch(API+'/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,status:st,description:d,date:dt,prizes:prizes})})
+  .then(function(){
+    D.events.unshift({id:Date.now(),title:t,status:st,desc:d,date:dt,prizes:prizes});
+    ['e-title','e-desc','e-date','e-prizes'].forEach(function(x){document.getElementById(x).value='';});
+    rEvTbl();
+    toast('Event "'+t+'" added!');
+  }).catch(function(){toast('Failed to save!','err');});
 }
 
 function delEvent(id){
