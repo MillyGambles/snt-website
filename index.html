@@ -202,7 +202,13 @@ h1 .hi{color:var(--accent);}
     <button class="tab" onclick="go('adm',this)">Admin</button>
   </div>
   <div class="nav-r">
-    <button class="btn btn-blue">Join Discord</button>
+    <button class="btn btn-blue" onclick="window.location.href='https://snt-backend-production.up.railway.app/auth/discord'" id="login-btn">Login with Discord</button>
+<div id="user-info" style="display:none;align-items:center;gap:8px;">
+  <img id="user-avatar" style="width:28px;height:28px;border-radius:50%;"/>
+  <span id="user-name" style="font-size:13px;font-weight:500;color:var(--text);"></span>
+  <span id="user-pts-nav" style="font-size:12px;color:var(--accent-l);"></span>
+  <button class="btn btn-ghost btn-sm" onclick="window.location.href='https://snt-backend-production.up.railway.app/auth/logout'">Logout</button>
+</div>
     <button class="mob-toggle" onclick="document.getElementById('mob').classList.toggle('on')">
       <span></span><span></span><span></span>
     </button>
@@ -655,7 +661,24 @@ function setClaim(id,st){
   toast(st==='delivered'?'Marked as delivered!':'Claim rejected.');
 }
 
-fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
+// Check if user just logged in via Discord
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('discord_id');
+  var name = params.get('username');
+  var avatar = params.get('avatar');
+  var pts = params.get('pts');
+  if(id && name){
+    document.getElementById('login-btn').style.display='none';
+    var ui = document.getElementById('user-info');
+    ui.style.display='flex';
+    document.getElementById('user-name').textContent = decodeURIComponent(name);
+    document.getElementById('user-pts-nav').textContent = parseInt(pts).toLocaleString()+' pts';
+    if(avatar) document.getElementById('user-avatar').src='https://cdn.discordapp.com/avatars/'+id+'/'+avatar+'.png';
+    D.myPts = parseInt(pts)||0;
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+})();fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});}).catch(function(){});
