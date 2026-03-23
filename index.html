@@ -380,8 +380,8 @@ h1 .hi{color:var(--accent);}
   function goAdmin(btn){
   if(!adminUnlocked){
     var pw = prompt('Enter admin password:');
-    if(pw === 'Milly'){
-      adminUnlocked = false;
+    if(pw === '111'){
+      adminUnlocked = true;
       go('adm', btn);
     } else {
       toast('Wrong password!','err');
@@ -393,8 +393,8 @@ h1 .hi{color:var(--accent);}
 function goAdminMob(btn){
   if(!adminUnlocked){
     var pw = prompt('Enter admin password:');
-    if(pw === 'Milly'){
-      adminUnlocked = false;
+    if(pw === '111'){
+      adminUnlocked = true;
       go('adm', btn, 1);
     } else {
       toast('Wrong password!','err');
