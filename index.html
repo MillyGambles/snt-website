@@ -796,7 +796,7 @@ function applyPreset(p){
   r.setProperty('--text3',p.t3);
   document.getElementById('t-accent').value=p.accent;
   document.getElementById('t-bg').value=p.bg;
-  fetch(API+'/theme',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)}).catch(function(){});
+  var saveData=Object.assign({},p);delete saveData.emoji;fetch(API+'/theme',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(saveData)}).catch(function(){});
   toast('Theme: '+p.name+' '+p.emoji);
   highlightPreset(p.name);
 }
