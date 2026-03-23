@@ -690,11 +690,14 @@ function delEvent(id){
 function savePts(uid){
   var v=parseInt(document.getElementById('pi-'+uid).value);
   if(isNaN(v)||v<0){toast('Invalid value!','err');return;}
-  var u=D.users.find(function(u){return u.id===uid;});
-  if(u){u.pts=v;u.inv=Math.round(v/10);}
-  rUsTbl();
-  rLB();
-  toast('Points updated!');
+  fetch(API+'/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:v})})
+  .then(function(){
+    var u=D.users.find(function(u){return u.id===uid;});
+    if(u){u.pts=v;u.inv=Math.round(v/10);}
+    rUsTbl();
+    rLB();
+    toast('Points updated!');
+  }).catch(function(){toast('Failed!','err');});
 }
 
 function delUser(uid){
@@ -706,10 +709,13 @@ function delUser(uid){
 }
 
 function setClaim(id,st){
-  var c=D.claims.find(function(c){return c.id===id;});
-  if(c) c.status=st;
-  rClTbl();
-  toast(st==='delivered'?'Marked as delivered!':'Claim rejected.');
+  fetch(API+'/claims/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:st})})
+  .then(function(){
+    var c=D.claims.find(function(c){return c.id===id;});
+    if(c) c.status=st;
+    rClTbl();
+    toast(st==='delivered'?'Marked as delivered!':'Claim rejected.');
+  }).catch(function(){toast('Failed!','err');});
 }
 
 // Check if user just logged in via Discord
