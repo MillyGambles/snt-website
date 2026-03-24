@@ -239,7 +239,7 @@ h1 .hi{color:var(--accent);}
       <div class="chip">March 2026</div>
     </div>
     <div class="lb">
-      <div class="lb-head"><span>RANK</span><span>USER</span><span class="hiv">INVITES</span><span>POINTS</span><span class="hpz">PRIZE</span></div>
+      <div class="lb-head"><span>RANK</span><span>USER</span><span class="hiv">INVITES</span><span>POINTS</span></div>
       <div id="lb-rows"></div>
     </div>
   </div>
@@ -496,7 +496,6 @@ function rLB(){
       '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+'">'+init+'</div><span class="uname">'+u.name+'</span></div>'+
       '<span class="inv-n civ">'+u.inv+'</span>'+
       '<span class="pts-n">'+u.pts.toLocaleString()+'</span>'+
-      '<span class="cpz">'+pz+'</span>'+
       '</div>';
   }
   document.getElementById('lb-rows').innerHTML=html||'<div class="empty">No users yet.</div>';
