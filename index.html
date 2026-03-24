@@ -599,8 +599,8 @@ function rUsTbl(){
     var u=s[i];
     html+='<tr>'+
       '<td><b>'+u.name+'</b></td>'+
-      '<td>'+u.inv+'</td>'+
-      '<td><div class="pts-inp"><input type="number" value="'+u.pts+'" id="pi-'+u.id+'"/><button class="btn btn-sm btn-ghost" onclick="savePts(\''+u.id+'\')">Save</button></div></td>'+
+      '<td><div class="pts-inp"><input type="number" value="'+u.inv+'" id="ii-'+u.id+'"/><button class="btn btn-sm btn-ghost" onclick="saveInv(\''+u.id+'\')">Save</button></div></td>'+
+'<td><div class="pts-inp"><input type="number" value="'+u.pts+'" id="pi-'+u.id+'"/><button class="btn btn-sm btn-ghost" onclick="savePts(\''+u.id+'\')">Save</button></div></td>'+
       '<td><button class="btn btn-sm btn-red" onclick="delUser(\''+u.id+'\')">Remove</button></td>'+
       '</tr>';
   }
@@ -697,6 +697,19 @@ function savePts(uid){
     rUsTbl();
     rLB();
     toast('Points updated!');
+  }).catch(function(){toast('Failed!','err');});
+}
+
+function saveInv(uid){
+  var v=parseInt(document.getElementById('ii-'+uid).value);
+  if(isNaN(v)||v<0){toast('Invalid value!','err');return;}
+  fetch(API+'/users/'+uid,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({total_invites:v})})
+  .then(function(){
+    var u=D.users.find(function(u){return u.id===uid;});
+    if(u){u.inv=v;}
+    rUsTbl();
+    rLB();
+    toast('Invites updated!');
   }).catch(function(){toast('Failed!','err');});
 }
 
