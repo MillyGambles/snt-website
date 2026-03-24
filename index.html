@@ -423,9 +423,7 @@ var D = {
     {id:2,name:'Nitro Basic',desc:'One month of Discord Nitro Basic for your account.',cost:1000,stock:5,icon:'⚡',active:true},
     {id:3,name:'SNT Chain',desc:'The most exclusive reward — a physical SNT chain for dedicated members.',cost:2000,stock:3,icon:'👑',active:true}
   ],
-  claims:[
-    {id:1,uid:'5',user:'Dami',item:'100 Robux',date:'2026-03-22',status:'pending'}
-  ],
+  claims:[],
   myPts:0
 };
 
@@ -607,24 +605,29 @@ function rUsTbl(){
 }
 
 function rClTbl(){
-  var sc={pending:'#f59e0b',delivered:'#22c55e',rejected:'#ef4444'};
-  var html='';
-  for(var i=0;i<D.claims.length;i++){
-    var c=D.claims[i];
-    html+='<tr>'+
-      '<td><b>'+c.user+'</b></td>'+
-      '<td>'+c.item+'</td>'+
-      '<td style="color:#8896aa">'+c.date+'</td>'+
-      '<td style="color:'+sc[c.status]+';font-size:11px;font-weight:700;">'+c.status.toUpperCase()+'</td>'+
-      '<td>'+(c.status==='pending'?
-        '<div class="act-row">'+
-        '<button class="btn btn-sm btn-green" onclick="setClaim('+c.id+',\'delivered\')">Deliver</button>'+
-        '<button class="btn btn-sm btn-red" onclick="setClaim('+c.id+',\'rejected\')">Reject</button>'+
-        '</div>':
-        '<span style="color:#3d4f65;font-size:12px;">Done</span>')+
-      '</td></tr>';
-  }
-  document.getElementById('cl-tbl').innerHTML=html||'<tr><td colspan="5" class="empty">No claims yet.</td></tr>';
+  fetch(API+'/claims').then(function(r){return r.json();}).then(function(data){
+    D.claims = data.map(function(c){return {id:c.id,uid:c.user_id,user:c.username,item:c.item_name,date:c.claimed_at?c.claimed_at.split('T')[0]:'-',status:c.status};});
+    var sc={pending:'#f59e0b',delivered:'#22c55e',rejected:'#ef4444'};
+    var html='';
+    for(var i=0;i<D.claims.length;i++){
+      var c=D.claims[i];
+      html+='<tr>'+
+        '<td><b>'+c.user+'</b></td>'+
+        '<td>'+c.item+'</td>'+
+        '<td style="color:#8896aa">'+c.date+'</td>'+
+        '<td style="color:'+sc[c.status]+';font-size:11px;font-weight:700;">'+c.status.toUpperCase()+'</td>'+
+        '<td>'+(c.status==='pending'?
+          '<div class="act-row">'+
+          '<button class="btn btn-sm btn-green" onclick="setClaim('+c.id+',\'delivered\')">Deliver</button>'+
+          '<button class="btn btn-sm btn-red" onclick="setClaim('+c.id+',\'rejected\')">Reject</button>'+
+          '</div>':
+          '<span style="color:#3d4f65;font-size:12px;">Done</span>')+
+        '</td></tr>';
+    }
+    document.getElementById('cl-tbl').innerHTML=html||'<tr><td colspan="5" class="empty">No claims yet.</td></tr>';
+  }).catch(function(){
+    document.getElementById('cl-tbl').innerHTML='<tr><td colspan="5" class="empty">Failed to load claims.</td></tr>';
+  });
 }
 
 function addItem(){
