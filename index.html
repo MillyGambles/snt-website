@@ -551,11 +551,29 @@ function rSH(){
 
 function claim(id){
   var it=D.items.find(function(i){return i.id===id;});
-  if(!it||D.myPts<it.cost){toast('Not enough points!','err');return;}
-  D.myPts-=it.cost;
-  D.claims.push({id:Date.now(),uid:'me',user:'You',item:it.name,date:new Date().toISOString().split('T')[0],status:'pending'});
-  toast('Claimed '+it.name+'! Check your Discord DMs.');
-  rSH();
+  if(!it){toast('Item not found!','err');return;}
+  if(!D.myId){toast('Login with Discord first!','err');return;}
+  if(D.myPts<it.cost){toast('Not enough points!','err');return;}
+
+  var newPts = D.myPts - it.cost;
+
+  fetch(API+'/users/'+D.myId,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:newPts})})
+  .then(function(r){return r.json();})
+  .then(function(){
+    return fetch(API+'/claims',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:D.myId,item_id:it.id})});
+  })
+  .then(function(r){return r.json();})
+  .then(function(){
+    D.myPts = newPts;
+    localStorage.setItem('snt_pts', newPts);
+    document.getElementById('user-pts-nav').textContent = newPts.toLocaleString()+' pts';
+    toast('Claimed '+it.name+'! Enjoy.');
+    rSH();
+  })
+  .catch(function(e){
+    console.error('Claim error:', e);
+    toast('Failed to claim!','err');
+  });
 }
 
 function rShTbl(){
