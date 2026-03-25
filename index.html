@@ -236,39 +236,40 @@ h1 .hi{color:var(--accent);}
 
 <div class="pg on" id="pg-lb">
   <div class="hero" style="display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;">
-  <div>
-    <div class="eyebrow"><span class="dot live"></span>LIVE RANKINGS</div>
-    <h1>Invite. Earn.<br/><span class="hi">Rise.</span></h1>
-    <p class="hero-sub">Every invite earns 100 points. Climb the leaderboard, unlock rewards and claim your SNT chain.</p>
-  </div>
-  <div id="hero-rotator" style="flex:1;min-width:320px;max-width:560px;display:none;">
-    <div id="hero-slide-event" style="background:var(--s1);border:1px solid var(--accent-border);border-radius:14px;padding:20px 24px;display:none;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent-l);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="dot live"></span>LIVE EVENT</div>
-      <div id="hero-event-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
-      <div id="hero-event-desc" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
-      <div style="font-size:12px;color:var(--accent-l);font-weight:600;margin-top:10px;">View event →</div>
+    <div>
+      <div class="eyebrow"><span class="dot live"></span>LIVE RANKINGS</div>
+      <h1>Invite. Earn.<br/><span class="hi">Rise.</span></h1>
+      <p class="hero-sub">Every invite earns 100 points. Climb the leaderboard, unlock rewards and claim your SNT chain.</p>
     </div>
-    <div id="hero-slide-ann" style="background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px 24px;display:none;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;">📢 ANNOUNCEMENT</div>
-      <div id="hero-ann-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
-      <div id="hero-ann-content" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
+    <div id="hero-rotator" style="flex:1;min-width:320px;max-width:560px;display:none;">
+      <div id="hero-slide-event" style="background:var(--s1);border:1px solid var(--accent-border);border-radius:14px;padding:20px 24px;display:none;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent-l);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="dot live"></span>LIVE EVENT</div>
+        <div id="hero-event-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
+        <div id="hero-event-desc" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
+        <div style="font-size:12px;color:var(--accent-l);font-weight:600;margin-top:10px;">View event →</div>
+      </div>
+      <div id="hero-slide-ann" style="background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px 24px;display:none;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;">📢 ANNOUNCEMENT</div>
+        <div id="hero-ann-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
+        <div id="hero-ann-content" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;" id="hero-dots"></div>
     </div>
-    <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;" id="hero-dots"></div>
   </div>
-</div>
   <div class="stats">
     <div class="stat"><div class="stat-n" id="s-inv">0</div><div class="stat-l">Total invites all time</div></div>
     <div class="stat"><div class="stat-n" id="s-mem">0</div><div class="stat-l">Active inviters</div></div>
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
   <div class="wrap">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div>
-    <div class="sec-head">
-      <div><div class="sec-title">Top Inviters</div><div class="sec-sub">Most invites all time</div></div>
-    </div>
-    <div class="lb">
-      <div class="lb-head" style="grid-template-columns:52px 1fr 100px;"><span>RANK</span><span>USER</span><span>INVITES</span></div>
-      <div id="lb-inv-rows"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 300px;gap:20px;">
+      <div>
+        <div class="sec-head">
+          <div><div class="sec-title">Top Inviters</div><div class="sec-sub">Most invites all time</div></div>
+        </div>
+        <div class="lb">
+          <div class="lb-head" style="grid-template-columns:52px 1fr 100px;"><span>RANK</span><span>USER</span><span>INVITES</span></div>
+          <div id="lb-inv-rows"></div>
         </div>
       </div>
       <div>
@@ -280,7 +281,15 @@ h1 .hi{color:var(--accent);}
           <div id="lb-pts-rows"></div>
         </div>
       </div>
-    </div>
+      <div>
+        <div class="sec-head">
+          <div><div class="sec-title">Activity</div><div class="sec-sub">Live feed</div></div>
+          <span class="dot live"></span>
+        </div>
+        <div id="activity-feed" style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;max-height:600px;overflow-y:auto;">
+          <div class="empty">Loading...</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1598,6 +1607,43 @@ function delRole(uid,name){
   .then(function(){loadUserRoles(uid);toast('Role removed.');})
   .catch(function(){toast('Failed!','err');});
 }
+
+// ─── ACTIVITY FEED ────────────────────────────────────────────────────────────
+var activityTimer=null;
+
+var ACT_ICONS={invite:'📨',claim:'🎁',badge:'🎖️',join:'👋',milestone:'🏆'};
+
+function loadActivity(){
+  fetch(API+'/activity').then(function(r){return r.json();}).then(function(data){
+    if(!data.length){document.getElementById('activity-feed').innerHTML='<div class="empty">No activity yet.</div>';return;}
+    var html='';
+    for(var i=0;i<data.length;i++){
+      var a=data[i];
+      var icon=ACT_ICONS[a.type]||'⚡';
+      var time=timeAgo(new Date(a.created_at));
+      var avatar=a.avatar&&a.user_id?'<img src="https://cdn.discordapp.com/avatars/'+a.user_id+'/'+a.avatar+'.png?size=32" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;" onerror="this.style.display=\'none\'"/>':'<div style="width:28px;height:28px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;">'+icon+'</div>';
+      html+='<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b1);">'+
+        avatar+
+        '<div style="flex:1;min-width:0;">'+
+          '<div style="font-size:12px;color:var(--text);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+a.message+'</div>'+
+          '<div style="font-size:10px;color:var(--text3);margin-top:1px;">'+time+'</div>'+
+        '</div>'+
+      '</div>';
+    }
+    document.getElementById('activity-feed').innerHTML=html;
+  }).catch(function(){});
+}
+
+function timeAgo(date){
+  var sec=Math.floor((new Date()-date)/1000);
+  if(sec<60) return 'just now';
+  if(sec<3600) return Math.floor(sec/60)+'m ago';
+  if(sec<86400) return Math.floor(sec/3600)+'h ago';
+  return Math.floor(sec/86400)+'d ago';
+}
+
+loadActivity();
+activityTimer=setInterval(loadActivity,15000);
 
 buildThemeUI();
 
