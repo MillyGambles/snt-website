@@ -59,7 +59,7 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.25;}}
 h1{font-family:'Syne',sans-serif;font-size:clamp(32px,4.5vw,52px);font-weight:700;;line-height:1.08;letter-spacing:-1.5px;margin-bottom:12px;}
 h1 .hi{color:var(--accent);}
-.hero-sub{color:var(--text2);font-size:15px;max-width:420px;line-height:1.7;}
+.hero-sub{color:var(--text2);font-size:15px;max-width:300px;line-height:1.7;}
 
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:1140px;margin:0 auto;padding:0 32px 44px;}
 .stat{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:18px 22px;border-top:2px solid var(--accent);}
@@ -240,13 +240,13 @@ h1 .hi{color:var(--accent);}
     <div id="hero-slide-event" style="background:var(--s1);border:1px solid var(--accent-border);border-radius:14px;padding:20px 24px;display:none;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent-l);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="dot live"></span>LIVE EVENT</div>
       <div id="hero-event-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
-      <div id="hero-event-desc" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+      <div id="hero-event-desc" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
       <div style="font-size:12px;color:var(--accent-l);font-weight:600;margin-top:10px;">View event →</div>
     </div>
     <div id="hero-slide-ann" style="background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px 24px;display:none;">
       <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;">📢 ANNOUNCEMENT</div>
       <div id="hero-ann-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
-      <div id="hero-ann-content" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+      <div id="hero-ann-content" style="font-size:12px;color:var(--text2);line-height:1.6;max-width:320px;"></div>
     </div>
     <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;" id="hero-dots"></div>
   </div>
