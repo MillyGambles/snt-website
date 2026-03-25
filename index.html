@@ -204,7 +204,7 @@ h1 .hi{color:var(--accent);}
     <button class="tab on" onclick="go('lb',this)">Leaderboard</button>
     <button class="tab" onclick="go('ev',this)">Events</button>
     <button class="tab" onclick="go('sh',this)">Shop</button>
-    <button class="tab" onclick="window.location.href='casino.html'">Casino</button>
+    <button class="tab" onclick="go('casino',this)">Casino</button>
     <button class="tab" onclick="goAdmin(this)">Admin</button>
   </div>
   <div class="nav-r">
@@ -225,7 +225,7 @@ h1 .hi{color:var(--accent);}
   <button class="mob-tab on" onclick="go('lb',this,1)">Leaderboard</button>
   <button class="mob-tab" onclick="go('ev',this,1)">Events</button>
   <button class="mob-tab" onclick="go('sh',this,1)">Shop</button>
-  <button class="mob-tab" onclick="window.location.href='casino.html'">Casino</button>
+  <button class="mob-tab" onclick="go('casino',this,1)">Casino</button>
   <button class="mob-tab" onclick="goAdminMob(this)">Admin</button>
 </div>
 
@@ -435,6 +435,164 @@ h1 .hi{color:var(--accent);}
       </div>
     </div>
   </div>
+  
+</div>
+<div class="pg" id="pg-casino">
+  <div style="max-width:1140px;margin:0 auto;padding:0 32px 60px;">
+    <div class="hero" style="padding:52px 0 36px;">
+      <div class="eyebrow"><span class="dot"></span>CASINO</div>
+      <h1>Play. Win. <span class="hi">Flex.</span></h1>
+      <p class="hero-sub">Gamble your invite points. Min bet: 10 pts · Max bet: 1,000 pts</p>
+    </div>
+    <div id="casino-content">
+      <!-- LOBBY -->
+      <div id="casino-lobby">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;">
+          <div class="sh-card" style="cursor:pointer;" onclick="openCasino('blackjack')"><div class="sh-icon">🃏</div><div class="sh-name">Blackjack</div><div class="sh-desc">Beat the dealer to 21. Blackjack pays 1.5×.</div></div>
+          <div class="sh-card" style="cursor:pointer;" onclick="openCasino('roulette')"><div class="sh-icon">🎡</div><div class="sh-name">Roulette</div><div class="sh-desc">Spin the wheel. Red, Black, Green and more.</div></div>
+          <div class="sh-card" style="cursor:pointer;" onclick="openCasino('cups')"><div class="sh-icon">🎩</div><div class="sh-name">Guess The Cup</div><div class="sh-desc">Track the ball through the shuffle.</div></div>
+          <div class="sh-card" style="cursor:pointer;" onclick="openCasino('baccarat')"><div class="sh-icon">🎴</div><div class="sh-name">Baccarat</div><div class="sh-desc">Bet Player, Banker or Tie. Closest to 9 wins.</div></div>
+          <div class="sh-card" style="cursor:pointer;" onclick="openCasino('slots')"><div class="sh-icon">🎰</div><div class="sh-name">Live Slots</div><div class="sh-desc">Paste any provider URL to load games.</div></div>
+        </div>
+      </div>
+      <!-- GAME AREA -->
+      <div id="casino-game" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button class="btn btn-ghost btn-sm" onclick="closeCasino()">← Lobby</button>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;" id="casino-game-title"></div>
+          <div style="margin-left:auto;font-size:13px;color:var(--text2);">Balance: <b id="casino-bal" style="color:var(--accent-l)">0</b> pts</div>
+        </div>
+        <!-- BET PANEL -->
+        <div class="form-box" id="casino-bet-panel" style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <span style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text2);">BET</span>
+            <input type="number" id="casino-bet" value="100" min="10" max="1000" style="background:var(--s2);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-size:16px;font-weight:700;padding:8px 16px;width:120px;outline:none;text-align:center;"/>
+            <input type="range" id="casino-slider" min="10" max="1000" value="100" step="10" style="flex:1;min-width:120px;accent-color:var(--accent);"/>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm" onclick="cAddBet(10)">+10</button>
+              <button class="btn btn-ghost btn-sm" onclick="cAddBet(50)">+50</button>
+              <button class="btn btn-ghost btn-sm" onclick="cAddBet(100)">+100</button>
+              <button class="btn btn-ghost btn-sm" onclick="cSetBet(1000)">MAX</button>
+              <button class="btn btn-ghost btn-sm" onclick="cHalfBet()">½</button>
+              <button class="btn btn-ghost btn-sm" onclick="cDoubleBet()">2×</button>
+            </div>
+            <span style="font-size:11px;color:var(--text3);">Min 10 · Max 1,000</span>
+          </div>
+        </div>
+        <div id="casino-result" style="display:none;border-radius:10px;padding:14px 20px;font-size:15px;font-weight:700;text-align:center;margin-bottom:16px;"></div>
+        <!-- BLACKJACK -->
+        <div id="cg-blackjack" style="display:none;">
+          <div class="form-box" style="margin-bottom:16px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">DEALER</div>
+            <div id="cbj-dealer" style="display:flex;gap:8px;flex-wrap:wrap;min-height:96px;"></div>
+            <div id="cbj-dscore" style="display:inline-flex;background:var(--s2);border:1px solid var(--b1);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:700;color:var(--text2);margin-top:8px;">?</div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin:16px 0 10px;">YOUR HAND</div>
+            <div id="cbj-player" style="display:flex;gap:8px;flex-wrap:wrap;min-height:96px;"></div>
+            <div id="cbj-pscore" style="display:inline-flex;background:var(--s2);border:1px solid var(--b1);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:700;color:var(--text2);margin-top:8px;">0</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-blue" id="cbj-deal" onclick="cbjDeal()">Deal</button>
+            <button class="btn btn-green" id="cbj-hit" onclick="cbjHit()" disabled>Hit</button>
+            <button class="btn btn-red" id="cbj-stand" onclick="cbjStand()" disabled>Stand</button>
+            <button class="btn btn-ghost" id="cbj-dbl" onclick="cbjDouble()" disabled>Double Down</button>
+          </div>
+        </div>
+        <!-- ROULETTE -->
+        <div id="cg-roulette" style="display:none;">
+          <div class="form-box" style="margin-bottom:16px;">
+            <div style="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start;">
+              <div style="text-align:center;flex-shrink:0;">
+                <div id="crl-wheel" style="width:160px;height:160px;border-radius:50%;background:conic-gradient(#e63946 0 9.72deg,#111 9.72deg 19.44deg,#e63946 19.44deg 29.16deg,#111 29.16deg 38.88deg,#e63946 38.88deg 48.6deg,#111 48.6deg 58.32deg,#e63946 58.32deg 68.04deg,#111 68.04deg 77.76deg,#e63946 77.76deg 87.48deg,#111 87.48deg 97.2deg,#e63946 97.2deg 106.92deg,#22c55e 106.92deg 116.64deg,#e63946 116.64deg 126.36deg,#111 126.36deg 136.08deg,#e63946 136.08deg 145.8deg,#111 145.8deg 155.52deg,#e63946 155.52deg 165.24deg,#111 165.24deg 174.96deg,#e63946 174.96deg 184.68deg,#111 184.68deg 194.4deg,#e63946 194.4deg 204.12deg,#111 204.12deg 213.84deg,#e63946 213.84deg 223.56deg,#111 223.56deg 233.28deg,#e63946 233.28deg 243deg,#111 243deg 252.72deg,#e63946 252.72deg 262.44deg,#111 262.44deg 272.16deg,#e63946 272.16deg 281.88deg,#111 281.88deg 291.6deg,#e63946 291.6deg 301.32deg,#111 301.32deg 311.04deg,#e63946 311.04deg 320.76deg,#111 320.76deg 330.48deg,#e63946 330.48deg 340.2deg,#111 340.2deg 360deg);border:3px solid var(--gold);position:relative;transition:transform 4s cubic-bezier(0.17,0.67,0.12,0.99);margin:0 auto 10px;">
+                  <div id="crl-num" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--s1);border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--accent-l);border:2px solid var(--b2);">—</div>
+                </div>
+              </div>
+              <div style="flex:1;min-width:180px;">
+                <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">BET TYPE</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;" id="crl-bets">
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('red',this)" style="text-align:left;">🔴 Red (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('black',this)" style="text-align:left;">⚫ Black (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('green',this)" style="text-align:left;">🟢 Zero (14×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('odd',this)" style="text-align:left;">Odd (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('even',this)" style="text-align:left;">Even (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('low',this)" style="text-align:left;">1–18 (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('high',this)" style="text-align:left;">19–36 (2×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('d1',this)" style="text-align:left;">1st 12 (3×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('d2',this)" style="text-align:left;">2nd 12 (3×)</button>
+                  <button class="btn btn-ghost btn-sm" onclick="cSelRL('d3',this)" style="text-align:left;">3rd 12 (3×)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-blue" id="crl-spin" onclick="crlSpin()">Spin the Wheel</button>
+        </div>
+        <!-- CUPS -->
+        <div id="cg-cups" style="display:none;">
+          <div class="form-box" style="margin-bottom:16px;text-align:center;">
+            <div id="ccup-status" style="font-size:13px;color:var(--text2);margin-bottom:16px;">Place your bet and start!</div>
+            <div style="display:flex;gap:40px;justify-content:center;margin:16px 0;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;" onclick="cPickCup(0)">
+                <div id="ccup-0" style="font-size:56px;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);">🎩</div>
+                <div id="cball-0" style="font-size:24px;opacity:0;transition:opacity 0.3s;">🔴</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;" onclick="cPickCup(1)">
+                <div id="ccup-1" style="font-size:56px;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);">🎩</div>
+                <div id="cball-1" style="font-size:24px;opacity:0;transition:opacity 0.3s;">🔴</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;" onclick="cPickCup(2)">
+                <div id="ccup-2" style="font-size:56px;transition:transform 0.4s cubic-bezier(0.34,1.56,0.64,1);">🎩</div>
+                <div id="cball-2" style="font-size:24px;opacity:0;transition:opacity 0.3s;">🔴</div>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-blue" id="ccup-start" onclick="cCupsStart()">Start Game</button>
+        </div>
+        <!-- BACCARAT -->
+        <div id="cg-baccarat" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+            <div class="form-box">
+              <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">PLAYER</div>
+              <div id="cbac-p" style="display:flex;gap:8px;flex-wrap:wrap;min-height:72px;"></div>
+              <div id="cbac-pscore" style="display:inline-flex;background:var(--s2);border:1px solid var(--b1);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:700;color:var(--text2);margin-top:8px;">0</div>
+            </div>
+            <div class="form-box">
+              <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">BANKER</div>
+              <div id="cbac-b" style="display:flex;gap:8px;flex-wrap:wrap;min-height:72px;"></div>
+              <div id="cbac-bscore" style="display:inline-flex;background:var(--s2);border:1px solid var(--b1);border-radius:99px;padding:3px 12px;font-size:12px;font-weight:700;color:var(--text2);margin-top:8px;">0</div>
+            </div>
+          </div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">BET ON</div>
+          <div style="display:flex;gap:8px;margin-bottom:14px;">
+            <button class="btn btn-ghost" onclick="cSelBac('player',this)">Player (2×)</button>
+            <button class="btn btn-ghost" onclick="cSelBac('banker',this)">Banker (1.95×)</button>
+            <button class="btn btn-ghost" onclick="cSelBac('tie',this)">Tie (8×)</button>
+          </div>
+          <button class="btn btn-blue" onclick="cBacDeal()">Deal</button>
+        </div>
+        <!-- SLOTS -->
+        <div id="cg-slots" style="display:none;">
+          <div class="form-box" style="margin-bottom:14px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">NUXGAME API KEY</div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <input type="password" id="cslots-api" placeholder="Enter NuxGame API key..." style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:7px;color:var(--text);font-size:13px;padding:8px 11px;outline:none;"/>
+              <button class="btn btn-green btn-sm" onclick="cSaveApiKey()">Save</button>
+            </div>
+            <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:var(--text3);margin-bottom:10px;">PROVIDER GAME URL</div>
+            <div style="display:flex;gap:8px;">
+              <input type="text" id="cslots-url" placeholder="Paste Pragmatic Play or any provider iframe URL..." style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:7px;color:var(--text);font-size:13px;padding:8px 11px;outline:none;"/>
+              <button class="btn btn-blue btn-sm" onclick="cLoadSlots()">Load</button>
+            </div>
+          </div>
+          <div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;height:560px;" id="cslots-body">
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--text2);text-align:center;padding:24px;">
+              <div style="font-size:48px;opacity:0.2;">🎰</div>
+              <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;opacity:0.3;">Paste a game URL above to load</div>
+              <div style="font-size:11px;opacity:0.3;max-width:400px;">Works with Pragmatic Play demo, NuxGame and most providers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <canvas id="anim-canvas" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0.25;"></canvas>
 
@@ -501,6 +659,7 @@ function go(id,btn,mob){
   if(id==='ev') rEV();
   if(id==='sh') rSH();
   if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();}
+  if(id==='casino'){cBal=parseInt(localStorage.getItem('snt_pts')||'0');document.getElementById('casino-bal').textContent=cBal.toLocaleString();}
 }
 
 var adminUnlocked = false;
@@ -1199,6 +1358,196 @@ function buildThemeUI(){
 }
 
 buildThemeUI();
+// ─── CASINO ───────────────────────────────────────────────────────────────────
+var cBal=parseInt(localStorage.getItem('snt_pts')||'0');
+var cRlBet='',cBacSel='',cCupBall=-1,cCupPhase='idle',cCupBetAmt=0;
+var cBjDeck=[],cBjP=[],cBjD=[],cBjHid=true;
+var C_SUITS=['♠','♥','♦','♣'],C_RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var C_RED=['♥','♦'];
+var RL_RED=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+
+function cUpdateBal(n){
+  cBal=Math.max(0,n);D.myPts=cBal;
+  localStorage.setItem('snt_pts',cBal);
+  localStorage.setItem('snt_pts',cBal);
+  document.getElementById('casino-bal').textContent=cBal.toLocaleString();
+  document.getElementById('user-pts-nav').textContent=cBal.toLocaleString()+' pts';
+  if(D.myId) fetch(API+'/users/'+D.myId,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:cBal})}).catch(function(){});
+}
+
+function cGetBet(){
+  var b=parseInt(document.getElementById('casino-bet').value)||100;
+  b=Math.max(10,Math.min(1000,Math.min(b,cBal)));
+  document.getElementById('casino-bet').value=b;
+  document.getElementById('casino-slider').value=b;
+  return b;
+}
+function cSetBet(n){var v=Math.min(n,cBal,1000);document.getElementById('casino-bet').value=v;document.getElementById('casino-slider').value=v;}
+function cAddBet(n){cSetBet((parseInt(document.getElementById('casino-bet').value)||0)+n);}
+function cHalfBet(){cSetBet(Math.max(10,Math.floor(cGetBet()/2)));}
+function cDoubleBet(){cSetBet(Math.min(cGetBet()*2,cBal,1000));}
+
+document.getElementById('casino-slider').addEventListener('input',function(){document.getElementById('casino-bet').value=this.value;});
+document.getElementById('casino-bet').addEventListener('input',function(){document.getElementById('casino-slider').value=Math.min(this.value,1000);});
+
+function cShowResult(msg,type){
+  var r=document.getElementById('casino-result');
+  r.textContent=msg;
+  r.style.display='block';
+  r.style.background=type==='win'?'rgba(34,197,94,0.1)':type==='lose'?'rgba(239,68,68,0.08)':'rgba(245,158,11,0.08)';
+  r.style.border='1px solid '+(type==='win'?'rgba(34,197,94,0.35)':type==='lose'?'rgba(239,68,68,0.25)':'rgba(245,158,11,0.25)');
+  r.style.color=type==='win'?'#4ade80':type==='lose'?'#f87171':'var(--gold)';
+}
+function cHideResult(){document.getElementById('casino-result').style.display='none';}
+
+function openCasino(id){
+  cBal=parseInt(localStorage.getItem('snt_pts')||'0');
+  document.getElementById('casino-lobby').style.display='none';
+  document.getElementById('casino-game').style.display='block';
+  document.querySelectorAll('[id^="cg-"]').forEach(function(e){e.style.display='none';});
+  document.getElementById('cg-'+id).style.display='block';
+  document.getElementById('casino-bet-panel').style.display=id==='slots'?'none':'block';
+  cHideResult();
+  var names={blackjack:'🃏 Blackjack',roulette:'🎡 Roulette',cups:'🎩 Guess The Cup',baccarat:'🎴 Baccarat',slots:'🎰 Live Slots'};
+  document.getElementById('casino-game-title').textContent=names[id]||id;
+  document.getElementById('casino-bal').textContent=cBal.toLocaleString();
+  if(id==='blackjack')cbjReset();
+  if(id==='baccarat'){document.getElementById('cbac-p').innerHTML='';document.getElementById('cbac-b').innerHTML='';document.getElementById('cbac-pscore').textContent='0';document.getElementById('cbac-bscore').textContent='0';}
+  if(id==='cups')cCupsReset();
+}
+
+function closeCasino(){
+  document.getElementById('casino-lobby').style.display='block';
+  document.getElementById('casino-game').style.display='none';
+  // refresh points display
+  document.getElementById('u-pts').textContent=cBal.toLocaleString()+' pts';
+}
+
+// BLACKJACK
+function cNewDeck(){var d=[];C_SUITS.forEach(function(s){C_RANKS.forEach(function(r){d.push({r:r,s:s});});});for(var i=d.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=d[i];d[i]=d[j];d[j]=t;}return d;}
+function cCardVal(c){if(['J','Q','K'].includes(c.r))return 10;if(c.r==='A')return 11;return parseInt(c.r);}
+function cHandScore(h){var s=0,a=0;h.forEach(function(c){s+=cCardVal(c);if(c.r==='A')a++;});while(s>21&&a>0){s-=10;a--;}return s;}
+function cMakeCard(c,back){
+  var el=document.createElement('div');
+  if(back){el.style.cssText='width:60px;height:84px;border-radius:7px;background:repeating-linear-gradient(45deg,#1e3a8a,#1e3a8a 3px,#1d4ed8 3px,#1d4ed8 6px);border:1px solid #1d4ed8;box-shadow:2px 3px 10px rgba(0,0,0,0.4);flex-shrink:0;animation:dealCard 0.35s ease;';return el;}
+  var isRed=C_RED.includes(c.s);
+  el.style.cssText='width:60px;height:84px;border-radius:7px;background:#fff;border:1px solid #d1d5db;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:2px 3px 10px rgba(0,0,0,0.4);flex-shrink:0;animation:dealCard 0.35s cubic-bezier(0.34,1.56,0.64,1);color:'+(isRed?'#e63946':'#111')+';';
+  el.innerHTML='<div style="position:absolute;top:4px;left:6px;font-size:12px;font-weight:900;line-height:1.1;">'+c.r+'<br/>'+c.s+'</div><div style="font-size:22px;">'+c.s+'</div><div style="position:absolute;bottom:4px;right:6px;font-size:12px;font-weight:900;line-height:1.1;transform:rotate(180deg);">'+c.r+'<br/>'+c.s+'</div>';
+  return el;
+}
+function cRenderBJ(){
+  var dc=document.getElementById('cbj-dealer'),pc=document.getElementById('cbj-player');
+  dc.innerHTML='';pc.innerHTML='';
+  cBjD.forEach(function(c,i){dc.appendChild(cMakeCard(c,cBjHid&&i===1));});
+  cBjP.forEach(function(c){pc.appendChild(cMakeCard(c));});
+  var ps=cHandScore(cBjP);
+  document.getElementById('cbj-pscore').textContent=ps;
+  document.getElementById('cbj-pscore').style.color=ps>21?'#f87171':ps===21?'var(--gold)':'var(--text2)';
+  document.getElementById('cbj-dscore').textContent=cBjHid?cCardVal(cBjD[0]):cHandScore(cBjD);
+}
+function cbjReset(){
+  cBjP=[];cBjD=[];cBjHid=true;
+  ['cbj-dealer','cbj-player'].forEach(function(id){document.getElementById(id).innerHTML='';});
+  document.getElementById('cbj-dscore').textContent='?';
+  document.getElementById('cbj-pscore').textContent='0';
+  document.getElementById('cbj-deal').disabled=false;
+  document.getElementById('cbj-hit').disabled=true;
+  document.getElementById('cbj-stand').disabled=true;
+  document.getElementById('cbj-dbl').disabled=true;
+  cHideResult();
+}
+function cbjDeal(){var bet=cGetBet();if(cBal<bet){toast('Not enough points!','err');return;}cBjDeck=cNewDeck();cBjP=[cBjDeck.pop(),cBjDeck.pop()];cBjD=[cBjDeck.pop(),cBjDeck.pop()];cBjHid=true;cUpdateBal(cBal-bet);cRenderBJ();document.getElementById('cbj-deal').disabled=true;document.getElementById('cbj-hit').disabled=false;document.getElementById('cbj-stand').disabled=false;document.getElementById('cbj-dbl').disabled=false;cHideResult();if(cHandScore(cBjP)===21)cbjStand();}
+function cbjHit(){cBjP.push(cBjDeck.pop());cRenderBJ();document.getElementById('cbj-dbl').disabled=true;if(cHandScore(cBjP)>=21)cbjStand();}
+function cbjDouble(){var bet=cGetBet();if(cBal<bet){toast('Not enough!','err');return;}cUpdateBal(cBal-bet);document.getElementById('casino-bet').value=Math.min(bet*2,1000);cBjP.push(cBjDeck.pop());cRenderBJ();cbjStand();}
+function cbjStand(){
+  cBjHid=false;document.getElementById('cbj-hit').disabled=true;document.getElementById('cbj-stand').disabled=true;document.getElementById('cbj-dbl').disabled=true;
+  while(cHandScore(cBjD)<17)cBjD.push(cBjDeck.pop());
+  cRenderBJ();
+  var ps=cHandScore(cBjP),ds=cHandScore(cBjD),bet=cGetBet();
+  if(ps>21){cShowResult('Bust! You lost '+bet+' pts.','lose');}
+  else if(ps===21&&cBjP.length===2&&!(ds===21&&cBjD.length===2)){var w=Math.floor(bet*2.5);cUpdateBal(cBal+w);cShowResult('Blackjack! +'+w+' pts! 🎉','win');toast('+'+w+' pts!','ok');}
+  else if(ds>21||ps>ds){cUpdateBal(cBal+bet*2);cShowResult('You win! +'+bet+' pts 🎉','win');toast('+'+bet+' pts!','ok');}
+  else if(ps===ds){cUpdateBal(cBal+bet);cShowResult('Push — bet returned.','push');}
+  else{cShowResult('Dealer wins. -'+bet+' pts.','lose');}
+  document.getElementById('cbj-deal').disabled=false;
+}
+
+// ROULETTE
+function cSelRL(type,btn){cRlBet=type;document.querySelectorAll('#crl-bets button').forEach(function(b){b.className='btn btn-ghost btn-sm';b.style.textAlign='left';});btn.style.background='var(--accent-dim)';btn.style.border='1px solid var(--accent-border)';btn.style.color='var(--accent-l)';}
+function crlSpin(){
+  if(!cRlBet){toast('Pick a bet type!','err');return;}
+  var bet=cGetBet();if(cBal<bet){toast('Not enough!','err');return;}
+  cUpdateBal(cBal-bet);document.getElementById('crl-spin').disabled=true;
+  var num=Math.floor(Math.random()*37);
+  var cur=parseInt(document.getElementById('crl-wheel').style.transform.replace(/[^0-9]/g,'')||0);
+  document.getElementById('crl-wheel').style.transform='rotate('+(cur+1440+(num*(360/37)))+'deg)';
+  setTimeout(function(){
+    document.getElementById('crl-num').textContent=num;document.getElementById('crl-spin').disabled=false;
+    var isRed=RL_RED.includes(num),won=false,mult=0;
+    if(cRlBet==='red'&&isRed&&num!==0){won=true;mult=2;}else if(cRlBet==='black'&&!isRed&&num!==0){won=true;mult=2;}else if(cRlBet==='green'&&num===0){won=true;mult=14;}else if(cRlBet==='odd'&&num%2!==0&&num!==0){won=true;mult=2;}else if(cRlBet==='even'&&num%2===0&&num!==0){won=true;mult=2;}else if(cRlBet==='low'&&num>=1&&num<=18){won=true;mult=2;}else if(cRlBet==='high'&&num>=19){won=true;mult=2;}else if(cRlBet==='d1'&&num>=1&&num<=12){won=true;mult=3;}else if(cRlBet==='d2'&&num>=13&&num<=24){won=true;mult=3;}else if(cRlBet==='d3'&&num>=25&&num<=36){won=true;mult=3;}
+    if(won){var w=bet*mult;cUpdateBal(cBal+w);cShowResult('Number '+num+'! +'+w+' pts 🎉','win');toast('+'+w+' pts!','ok');}
+    else{cShowResult('Number '+num+'. Better luck next time!','lose');}
+  },4300);
+}
+
+// CUPS
+function cCupsReset(){cCupBall=-1;cCupPhase='idle';[0,1,2].forEach(function(i){document.getElementById('ccup-'+i).style.transform='';document.getElementById('cball-'+i).style.opacity='0';});document.getElementById('ccup-status').textContent='Place your bet and start!';document.getElementById('ccup-start').disabled=false;cHideResult();}
+function cCupsStart(){
+  var bet=cGetBet();if(cBal<bet){toast('Not enough!','err');return;}
+  cUpdateBal(cBal-bet);cCupBetAmt=bet;cCupBall=Math.floor(Math.random()*3);cCupPhase='show';
+  document.getElementById('ccup-start').disabled=true;document.getElementById('ccup-status').textContent='Watch carefully!';
+  [0,1,2].forEach(function(i){document.getElementById('ccup-'+i).style.transform='translateY(-50px)';if(i===cCupBall)document.getElementById('cball-'+i).style.opacity='1';});
+  setTimeout(function(){[0,1,2].forEach(function(i){document.getElementById('ccup-'+i).style.transform='';document.getElementById('cball-'+i).style.opacity='0';});document.getElementById('ccup-status').textContent='Shuffling...';setTimeout(function(){cRunShuffle(0,8+Math.floor(Math.random()*5));},600);},2200);
+}
+function cRunShuffle(move,total){
+  if(move>=total){cCupPhase='pick';document.getElementById('ccup-status').textContent='Find the ball! Click a cup.';return;}
+  var a=Math.floor(Math.random()*3),b;do{b=Math.floor(Math.random()*3);}while(b===a);
+  var spd=Math.max(150,300-move*15);
+  var ca=document.getElementById('ccup-'+a),cb=document.getElementById('ccup-'+b);
+  ca.style.transition='transform '+spd+'ms ease';cb.style.transition='transform '+spd+'ms ease';
+  ca.style.transform='translateX(160px)';cb.style.transform='translateX(-160px)';
+  if(cCupBall===a)cCupBall=b;else if(cCupBall===b)cCupBall=a;
+  setTimeout(function(){ca.style.transform='';cb.style.transform='';setTimeout(function(){cRunShuffle(move+1,total);},spd*0.6);},spd);
+}
+function cPickCup(i){
+  if(cCupPhase!=='pick')return;cCupPhase='done';
+  document.getElementById('ccup-'+i).style.transform='translateY(-50px)';
+  document.getElementById('cball-'+cCupBall).style.opacity='1';
+  if(i!==cCupBall)setTimeout(function(){document.getElementById('ccup-'+cCupBall).style.transform='translateY(-50px)';},400);
+  if(i===cCupBall){var w=cCupBetAmt*2;cUpdateBal(cBal+w);cShowResult('Correct! +'+w+' pts 🎉','win');toast('+'+w+' pts!','ok');}
+  else{cShowResult('Wrong cup! -'+cCupBetAmt+' pts.','lose');}
+  document.getElementById('ccup-status').textContent='';
+  setTimeout(function(){cCupsReset();},2500);
+}
+
+// BACCARAT
+function cSelBac(type,btn){cBacSel=type;document.querySelectorAll('#cg-baccarat .btn-ghost, #cg-baccarat .btn-blue').forEach(function(b){if(b.onclick&&b.onclick.toString().includes('cSelBac')){b.className='btn btn-ghost';}});btn.style.background='var(--accent-dim)';btn.style.border='1px solid var(--accent-border)';btn.style.color='var(--accent-l)';}
+function cBacVal(h){var s=0;h.forEach(function(c){var v=cCardVal(c);if(v>=10)v=0;s+=v;});return s%10;}
+function cBacDeal(){
+  if(!cBacSel){toast('Pick Player, Banker or Tie!','err');return;}
+  var bet=cGetBet();if(cBal<bet){toast('Not enough!','err');return;}
+  cUpdateBal(cBal-bet);
+  var deck=cNewDeck(),p=[deck.pop(),deck.pop()],b=[deck.pop(),deck.pop()];
+  var ps=cBacVal(p),bs=cBacVal(b);
+  if(ps<=5)p.push(deck.pop());if(bs<=5)b.push(deck.pop());
+  ps=cBacVal(p);bs=cBacVal(b);
+  var pc=document.getElementById('cbac-p'),bc=document.getElementById('cbac-b');
+  pc.innerHTML='';bc.innerHTML='';
+  p.forEach(function(c){pc.appendChild(cMakeCard(c));});b.forEach(function(c){bc.appendChild(cMakeCard(c));});
+  document.getElementById('cbac-pscore').textContent=ps;document.getElementById('cbac-bscore').textContent=bs;
+  var winner=ps>bs?'player':bs>ps?'banker':'tie';
+  if(cBacSel===winner){var mult=cBacSel==='tie'?8:cBacSel==='banker'?1.95:2;var w=Math.floor(bet*mult);cUpdateBal(cBal+w);cShowResult(winner+' wins! +'+w+' pts 🎉','win');toast('+'+w+' pts!','ok');}
+  else{cShowResult(winner+' wins. -'+bet+' pts.','lose');}
+}
+
+// SLOTS
+function cSaveApiKey(){var k=document.getElementById('cslots-api').value.trim();if(!k){toast('Enter a key!','err');return;}localStorage.setItem('nuxgame_key',k);toast('API key saved!','ok');}
+function cLoadSlots(){var url=document.getElementById('cslots-url').value.trim();if(!url){toast('Paste a URL first!','err');return;}document.getElementById('cslots-body').innerHTML='<iframe src="'+url+'" allowfullscreen allow="autoplay" style="width:100%;height:100%;border:none;"></iframe>';toast('Game loaded!','ok');}
+
+// Add card deal animation
+var casinoStyle=document.createElement('style');
+casinoStyle.textContent='@keyframes dealCard{from{opacity:0;transform:translateY(-40px) rotate(-8deg) scale(0.8);}to{opacity:1;transform:none;}}';
+document.head.appendChild(casinoStyle);
 </script>
 </body>
 </html>
