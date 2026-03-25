@@ -407,14 +407,7 @@ function goAdminMob(btn){
   }
 }
 var D = {
-  users:[
-    {id:'1',name:'User1',pts:1420,inv:142},
-    {id:'2',name:'User2',pts:980,inv:98},
-    {id:'3',name:'User3',pts:740,inv:74},
-    {id:'4',name:'User4',pts:510,inv:51},
-    {id:'5',name:'User5',pts:400,inv:39},
-    {id:'6',name:'User6',pts:270,inv:27}
-  ],
+  users:[],
   events:[
     {id:1,title:'March Invite Giveaway',status:'live',desc:'Invite the most people and win prizes. No alts, no bots. Top 3 inviters at end of March win.',date:'Mar 31, 2026',prizes:['$10 Nitro','Nitro Basic','200 RBX']},
     {id:2,title:'SNT Chain Drop',status:'upcoming',desc:'Reach 2,000 points and claim an exclusive SNT chain. Limited stock — first come first served.',date:'Apr 1, 2026',prizes:['SNT Chain']},
@@ -475,30 +468,32 @@ function toast(msg,type){
 }
 
 function rLB(){
-  var s=D.users.slice().sort(function(a,b){return b.pts-a.pts;});
-  var ti=s.reduce(function(acc,u){return acc+u.inv;},0);
-  document.getElementById('s-inv').textContent=ti;
-  document.getElementById('s-mem').textContent=s.length;
-  document.getElementById('s-clm').textContent=D.claims.filter(function(c){return c.status==='delivered';}).length;
   var rkC=['rk1','rk2','rk3'];
-  var prC=['pg1','ps2','pb3'];
-  var prT=['$10 Nitro','Nitro Basic','200 RBX'];
-  var html='';
-  for(var i=0;i<s.length;i++){
-    var u=s[i];
-    var ac=AV[i%AV.length];
-    var init=u.name.substring(0,2).toUpperCase();
-    var rNum=String(i+1).length<2?'0'+(i+1):''+(i+1);
-    var rCls=i<3?rkC[i]:'rkn';
-    var pz=i<3?('<span class="pill '+prC[i]+'">'+prT[i]+'</span>'):'<span class="pill pn">—</span>';
-    html+='<div class="lb-row">'+
-      '<span class="rk '+rCls+'">'+rNum+'</span>'+
-      '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+(u.avatar?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=64" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\'">':init)+'</div><span class="uname">'+u.name+'</span></div>'+
-      '<span class="inv-n civ">'+u.inv+'</span>'+
-      '<span class="pts-n">'+u.pts.toLocaleString()+'</span>'+
-      '</div>';
+  function renderBoard(sortedUsers, containerId, valueKey, valueLabel){
+    var html='';
+    for(var i=0;i<sortedUsers.length;i++){
+      var u=sortedUsers[i];
+      var ac=AV[i%AV.length];
+      var init=u.name.substring(0,2).toUpperCase();
+      var rNum=i<9?'0'+(i+1):''+(i+1);
+      var rCls=i<3?rkC[i]:'rkn';
+      var avatar=u.avatar&&u.id?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=64" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\'">':init;
+      html+='<div class="lb-row" style="grid-template-columns:52px 1fr 100px;">'+
+        '<span class="rk '+rCls+'">'+rNum+'</span>'+
+        '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+avatar+'</div><span class="uname">'+u.name+'</span></div>'+
+        '<span class="pts-n">'+u[valueKey].toLocaleString()+'</span>'+
+        '</div>';
+    }
+    document.getElementById(containerId).innerHTML=html||'<div class="empty">No data yet.</div>';
   }
-  document.getElementById('lb-rows').innerHTML=html||'<div class="empty">No users yet.</div>';
+  var byInv=D.users.slice().sort(function(a,b){return b.inv-a.inv;});
+  var byPts=D.users.slice().sort(function(a,b){return b.pts-a.pts;});
+  renderBoard(byInv,'lb-inv-rows','inv','invites');
+  renderBoard(byPts,'lb-pts-rows','pts','points');
+  var ti=D.users.reduce(function(acc,u){return acc+u.inv;},0);
+  document.getElementById('s-inv').textContent=ti;
+  document.getElementById('s-mem').textContent=D.users.length;
+  document.getElementById('s-clm').textContent=D.claims.filter(function(c){return c.status==='delivered';}).length;
 }
 
 function rEV(){
