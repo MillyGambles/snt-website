@@ -1033,6 +1033,7 @@ fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){docu
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
   D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});
+  rEV();
   loadHeroRotator();
 }).catch(function(){});
 
@@ -1342,23 +1343,25 @@ function heroShow(idx){
 }
 
 function loadHeroRotator(){
-  var liveEvent=D.events.find(function(e){return e.status==='live';});
-  if(liveEvent) heroSlides.push({type:'event',title:liveEvent.title,desc:liveEvent.desc});
-  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
+  heroSlides=[];
+  if(heroTimer){clearInterval(heroTimer);heroTimer=null;}
+  fetch(API+'/events').then(function(r){return r.json();}).then(function(evData){
+    var evs=evData.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description};});
+    var live=evs.find(function(e){return e.status==='live';});
+    if(live) heroSlides.push({type:'event',title:live.title,desc:live.desc});
+    return fetch(API+'/announcements');
+  }).then(function(r){return r.json();}).then(function(data){
     data.forEach(function(a){heroSlides.push({type:'ann',title:a.title,content:a.content});});
     if(heroSlides.length>0){
       document.getElementById('hero-rotator').style.display='block';
       heroShow(0);
       if(heroSlides.length>1) heroTimer=setInterval(function(){heroShow((heroIdx+1)%heroSlides.length);},10000);
+    } else {
+      document.getElementById('hero-rotator').style.display='none';
     }
-    // also populate ann-feed for admin
-  }).catch(function(){
-    if(heroSlides.length>0){
-      document.getElementById('hero-rotator').style.display='block';
-      heroShow(0);
-    }
-  });
+  }).catch(function(){});
 }
+
 function rAnnTbl(){
   fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
     var html='';
