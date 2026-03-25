@@ -493,7 +493,7 @@ function rLB(){
     var pz=i<3?('<span class="pill '+prC[i]+'">'+prT[i]+'</span>'):'<span class="pill pn">—</span>';
     html+='<div class="lb-row">'+
       '<span class="rk '+rCls+'">'+rNum+'</span>'+
-      '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+'">'+init+'</div><span class="uname">'+u.name+'</span></div>'+
+      '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+(u.avatar?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=64" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\'">':init)+'</div><span class="uname">'+u.name+'</span></div>'+
       '<span class="inv-n civ">'+u.inv+'</span>'+
       '<span class="pts-n">'+u.pts.toLocaleString()+'</span>'+
       '</div>';
@@ -803,7 +803,7 @@ function logoutUser(){
     }
   }
 })();
-fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
+fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,avatar:u.avatar,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});}).catch(function(){});
