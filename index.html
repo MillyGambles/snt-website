@@ -301,6 +301,11 @@ h1 .hi{color:var(--accent);}
   <div class="wrap">
     <div class="sec-head">
       <div><div class="sec-title">Available Rewards</div><div class="sec-sub">Your balance: <b id="u-pts" style="color:var(--accent-l)">0 pts</b></div></div>
+      <button class="btn btn-ghost btn-sm" onclick="toggleHistory()">My Claim History</button>
+    </div>
+    <div id="history-box" style="display:none;background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:20px;margin-bottom:20px;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">Your Claim History</div>
+      <div id="history-rows"><div class="empty">Loading...</div></div>
     </div>
     <div class="shop-grid" id="sh-rows"></div>
   </div>
@@ -1305,6 +1310,40 @@ function buildThemeUI(){
   }
   rg.innerHTML=html;
   highlightPreset('Default');
+}
+
+// ─── CLAIM HISTORY ────────────────────────────────────────────────────────────
+function toggleHistory(){
+  var box=document.getElementById('history-box');
+  if(box.style.display==='none'){
+    if(!D.myId){toast('Login with Discord first!','err');return;}
+    box.style.display='block';
+    loadHistory();
+  } else {
+    box.style.display='none';
+  }
+}
+
+function loadHistory(){
+  if(!D.myId) return;
+  fetch(API+'/claims/user/'+D.myId).then(function(r){return r.json();}).then(function(data){
+    if(!data.length){document.getElementById('history-rows').innerHTML='<div class="empty">No claims yet.</div>';return;}
+    var sc={pending:'#f59e0b',delivered:'#22c55e',rejected:'#ef4444'};
+    var html='';
+    for(var i=0;i<data.length;i++){
+      var c=data[i];
+      var date=new Date(c.claimed_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b1);">'+
+        '<div style="display:flex;align-items:center;gap:10px;">'+
+        '<div style="font-size:22px;">'+(c.icon||'🎁')+'</div>'+
+        '<div><div style="font-size:13px;font-weight:600;">'+c.item_name+'</div>'+
+        '<div style="font-size:11px;color:var(--text2);">'+date+'</div></div>'+
+        '</div>'+
+        '<div style="font-size:11px;font-weight:700;color:'+sc[c.status]+';background:'+sc[c.status]+'18;border:1px solid '+sc[c.status]+'40;padding:3px 10px;border-radius:99px;">'+c.status.toUpperCase()+'</div>'+
+        '</div>';
+    }
+    document.getElementById('history-rows').innerHTML=html;
+  }).catch(function(){document.getElementById('history-rows').innerHTML='<div class="empty">Failed to load.</div>';});
 }
 
 buildThemeUI();
