@@ -1563,7 +1563,7 @@ function toggleEquip(key,el){
   var eq=window._equippedKeys||[];
   var idx=eq.indexOf(key);
   if(idx>-1){eq.splice(idx,1);}
-  else{if(eq.length>=3){toast('Max 3 badges equipped!','err');return;}eq.push(key);}
+  else{if(eq.length>=1){toast('Unequip your current badge first!','err');return;}eq.push(key);}
   window._equippedKeys=eq;
   fetch(API+'/equipped/'+D.myId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({badge_keys:eq.join(',')})})
   .then(function(){
