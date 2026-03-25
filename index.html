@@ -159,6 +159,9 @@ h1 .hi{color:var(--accent);}
 #toast.on{opacity:1;transform:translateY(0);}
 #toast.ok{border-color:rgba(34,197,94,0.35);color:#4ade80;}
 #toast.err{border-color:rgba(239,68,68,0.35);color:#f87171;}
+.badge-tip{position:relative;display:inline-block;}
+.badge-tip:hover .tip{display:block;}
+.tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:6px 10px;font-size:11px;white-space:nowrap;z-index:200;pointer-events:none;color:var(--text);}
 
 .empty{padding:40px;text-align:center;color:var(--text2);font-size:13px;}
 
@@ -364,7 +367,7 @@ h1 .hi{color:var(--accent);}
         </div>
         <div class="adm-panel" id="ap-users">
           <div class="adm-title">Users & Points</div>
-          <div class="tbl"><table><thead><tr><th>USER</th><th>INVITES</th><th>POINTS</th><th>ACTIONS</th></tr></thead><tbody id="us-tbl"></tbody></table></div>
+          <div class="tbl"><table><thead><tr><th>USER</th><th>INVITES</th><th>POINTS</th><th>ROLES</th><th>ACTIONS</th></tr></thead><tbody id="us-tbl"></tbody></table></div>
         </div>
         <div class="adm-panel" id="ap-claims">
           <div class="adm-title">Reward Claims</div>
@@ -467,8 +470,10 @@ h1 .hi{color:var(--accent);}
       <h1 id="prof-name">Your<br/><span class="hi">Profile.</span></h1>
       <p class="hero-sub" id="prof-sub">View your stats, badges and claim history.</p>
     </div>
-    <div id="prof-avatar-wrap" style="display:none;">
-      <img id="prof-avatar-img" style="width:96px;height:96px;border-radius:50%;border:3px solid var(--accent-border);"/>
+    <div id="prof-avatar-wrap" style="display:none;text-align:center;">
+      <img id="prof-avatar-img" style="width:96px;height:96px;border-radius:50%;border:3px solid var(--accent-border);display:block;margin-bottom:8px;"/>
+      <div id="prof-equipped-display" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;"></div>
+      <div id="prof-roles-display" style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap;"></div>
     </div>
   </div>
   <div class="wrap">
@@ -490,6 +495,7 @@ h1 .hi{color:var(--accent);}
       </div>
       <!-- BADGES -->
       <div class="sec-head"><div><div class="sec-title">Badges</div><div class="sec-sub" id="prof-badge-sub"></div></div></div>
+      <div id="prof-equip-hint" style="display:none;font-size:12px;color:var(--text2);margin-bottom:10px;">Click an unlocked badge to equip/unequip it (max 3 shown on leaderboard).</div>
       <div id="prof-badges" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;"></div>
       <!-- CLAIMS -->
       <div class="sec-head"><div><div class="sec-title">Claim History</div></div></div>
@@ -753,11 +759,13 @@ function rLB(){
       var rNum=i<9?'0'+(i+1):''+(i+1);
       var rCls=i<3?rkC[i]:'rkn';
       var avatar=u.avatar&&u.id?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=64" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\'">':init;
-      html+='<div class="lb-row" style="grid-template-columns:52px 1fr 100px;">'+
-        '<span class="rk '+rCls+'">'+rNum+'</span>'+
-        '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+avatar+'</div><span class="uname" style="cursor:pointer;" onclick="viewProfile(\''+u.id+'\')">'+u.name+'</span></div>'+
-        '<span class="pts-n">'+u[valueKey].toLocaleString()+'</span>'+
-        '</div>';
+      var badgeHtml='';
+if(u.equipped){var eq=u.equipped.split(',').filter(Boolean);for(var k=0;k<eq.length;k++){var bd=BADGE_DEFS.find(function(b){return b.key===eq[k];});if(bd)badgeHtml+='<span class="badge-tip" style="font-size:14px;">'+bd.emoji+'<span class="tip">'+bd.label+'</span></span>';}}
+html+='<div class="lb-row" style="grid-template-columns:52px 1fr 100px;">'+
+  '<span class="rk '+rCls+'">'+rNum+'</span>'+
+  '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+avatar+'</div><span class="uname" style="cursor:pointer;" onclick="viewProfile(\''+u.id+'\')">'+u.name+'</span><span style="display:flex;gap:2px;margin-left:4px;">'+badgeHtml+'</span></div>'+
+  '<span class="pts-n">'+u[valueKey].toLocaleString()+'</span>'+
+  '</div>';
     }
     document.getElementById(containerId).innerHTML=html||'<div class="empty">No data yet.</div>';
   }
@@ -888,10 +896,12 @@ function rUsTbl(){
       '<td><b>'+u.name+'</b></td>'+
       '<td><div class="pts-inp"><input type="number" value="'+u.inv+'" id="ii-'+u.id+'"/><button class="btn btn-sm btn-ghost" onclick="saveInv(\''+u.id+'\')">Save</button></div></td>'+
 '<td><div class="pts-inp"><input type="number" value="'+u.pts+'" id="pi-'+u.id+'"/><button class="btn btn-sm btn-ghost" onclick="savePts(\''+u.id+'\')">Save</button></div></td>'+
-      '<td><button class="btn btn-sm btn-red" onclick="delUser(\''+u.id+'\')">Remove</button></td>'+
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;" id="roles-'+u.id+'"></div><div style="display:flex;gap:4px;margin-top:4px;"><input id="ri-'+u.id+'" placeholder="Role name" style="background:var(--s2);border:1px solid var(--b1);border-radius:6px;color:var(--text);font-size:12px;padding:4px 8px;outline:none;width:100px;"/><input type="color" id="rc-'+u.id+'" value="#3b82f6" style="width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;background:none;"/><button class="btn btn-sm btn-blue" onclick="addRole(\''+u.id+'\')">+</button></div></td>'+
+'<td><button class="btn btn-sm btn-red" onclick="delUser(\''+u.id+'\')">Remove</button></td>'+
       '</tr>';
   }
   document.getElementById('us-tbl').innerHTML=html||'<tr><td colspan="4" class="empty">No users.</td></tr>';
+  D.users.forEach(function(u){loadUserRoles(u.id);});
 }
 
 function rClTbl(){
@@ -1073,7 +1083,15 @@ function logoutUser(){
     }
   }
 })();
-fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,avatar:u.avatar,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
+fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){
+  D.users=data.map(function(u){return {id:u.id,name:u.username,avatar:u.avatar,pts:u.points,inv:u.total_invites,equipped:''};});
+  rLB();
+  D.users.forEach(function(u){
+    fetch(API+'/equipped/'+u.id).then(function(r){return r.json();}).then(function(eq){
+      u.equipped=eq.badge_keys||'';rLB();
+    }).catch(function(){});
+  });
+}).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
@@ -1446,13 +1464,30 @@ function loadProfile(userId){
       return;
     }
     var u=data.user;
+    var equippedKeys=data.equippedBadges?data.equippedBadges.split(',').filter(Boolean):[];
     // avatar
     if(u.avatar){
       document.getElementById('prof-avatar-img').src='https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=128';
       document.getElementById('prof-avatar-wrap').style.display='block';
     }
+    // equipped badges display
+    var eqHtml='';
+    for(var i=0;i<equippedKeys.length;i++){
+      var bd=BADGE_DEFS.find(function(b){return b.key===equippedKeys[i];});
+      if(bd) eqHtml+='<span class="badge-tip" style="font-size:24px;">'+bd.emoji+'<span class="tip">'+bd.label+'</span></span>';
+    }
+    document.getElementById('prof-equipped-display').innerHTML=eqHtml;
+    // roles display
+    var rolesHtml='';
+    if(data.roles&&data.roles.length){
+      for(var i=0;i<data.roles.length;i++){
+        var r=data.roles[i];
+        rolesHtml+='<span style="font-size:11px;font-weight:700;padding:2px 10px;border-radius:99px;background:'+r.color+'22;color:'+r.color+';border:1px solid '+r.color+'44;">'+r.role_name+'</span>';
+      }
+    }
+    document.getElementById('prof-roles-display').innerHTML=rolesHtml;
     // name
-    document.getElementById('prof-name').innerHTML=(isOwn?'Your':'')+'<br/><span class="hi">'+u.username+'</span>';
+    document.getElementById('prof-name').innerHTML=(isOwn?'Your<br/>':'')+'<span class="hi">'+u.username+'</span>';
     document.getElementById('prof-sub').textContent=isOwn?'Your stats, badges and claim history.':u.username+'\'s profile.';
     // privacy toggle
     var pb=document.getElementById('prof-privacy-box');
@@ -1466,7 +1501,7 @@ function loadProfile(userId){
       {label:'Invite Rank',val:'#'+data.invRank,icon:'🏆'},
       {label:'Points Rank',val:'#'+data.ptsRank,icon:'⭐'},
       {label:'Joined',val:joined,icon:'📅'},
-      {label:'Badges',val:data.badges.length,icon:'🎖️'},
+      {label:'Badges',val:data.badges.length+' / '+BADGE_DEFS.length,icon:'🎖️'},
     ];
     var sh='';
     for(var i=0;i<stats.length;i++){
@@ -1474,16 +1509,19 @@ function loadProfile(userId){
     }
     document.getElementById('prof-stats').innerHTML=sh;
     // badges
+    if(isOwn) document.getElementById('prof-equip-hint').style.display='block';
     var bh='';
     var earned=data.badges;
     for(var i=0;i<BADGE_DEFS.length;i++){
       var bd=BADGE_DEFS[i];
       var has=earned.indexOf(bd.key)>-1;
-      bh+='<div style="background:var(--s1);border:1px solid '+(has?'var(--accent-border)':'var(--b1)')+';border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;opacity:'+(has?'1':'0.35')+';">'+
+      var isEq=equippedKeys.indexOf(bd.key)>-1;
+      var equipStyle=isEq?'box-shadow:0 0 0 2px var(--accent);':'';
+      bh+='<div style="background:var(--s1);border:1px solid '+(has?'var(--accent-border)':'var(--b1)')+';border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;opacity:'+(has?'1':'0.35')+';'+equipStyle+';'+(has&&isOwn?'cursor:pointer;':'')+';" '+(has&&isOwn?'onclick="toggleEquip(\''+bd.key+'\',this)"':'')+' data-key="'+bd.key+'">'+
         '<div style="font-size:28px;">'+bd.emoji+'</div>'+
         '<div><div style="font-size:13px;font-weight:700;color:'+(has?'var(--text)':'var(--text2)')+';">'+bd.label+'</div>'+
         '<div style="font-size:11px;color:var(--text2);">'+bd.desc+'</div>'+
-        (has?'<div style="font-size:10px;color:var(--accent-l);margin-top:2px;font-weight:600;">UNLOCKED</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px;">LOCKED</div>')+
+        (has?'<div style="font-size:10px;color:'+(isEq?'var(--accent-l)':'var(--green)')+';margin-top:2px;font-weight:600;">'+(isEq?'✓ EQUIPPED':'UNLOCKED')+'</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px;">LOCKED</div>')+
         '</div></div>';
     }
     document.getElementById('prof-badges').innerHTML=bh||'<div class="empty">No badges yet.</div>';
@@ -1491,7 +1529,7 @@ function loadProfile(userId){
     // claims
     var ch='';
     var sc={pending:'#f59e0b',delivered:'#22c55e',rejected:'#ef4444'};
-    if(data.claims.length===0){ch='<div class="empty">No claims yet.</div>';}
+    if(!data.claims||data.claims.length===0){ch='<div class="empty">No claims yet.</div>';}
     else{
       for(var i=0;i<data.claims.length;i++){
         var c=data.claims[i];
@@ -1506,12 +1544,58 @@ function loadProfile(userId){
       }
     }
     document.getElementById('prof-claims').innerHTML=ch;
+    // store equipped for toggle
+    window._equippedKeys=equippedKeys;
+    window._earnedBadges=earned;
   }).catch(function(){document.getElementById('prof-stats').innerHTML='<div class="empty">Failed to load profile.</div>';});
+}
+
+function toggleEquip(key,el){
+  if(!D.myId) return;
+  var eq=window._equippedKeys||[];
+  var idx=eq.indexOf(key);
+  if(idx>-1){eq.splice(idx,1);}
+  else{if(eq.length>=3){toast('Max 3 badges equipped!','err');return;}eq.push(key);}
+  window._equippedKeys=eq;
+  fetch(API+'/equipped/'+D.myId,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({badge_keys:eq.join(',')})})
+  .then(function(){
+    toast(idx>-1?'Badge unequipped!':'Badge equipped!');
+    loadProfile(D.myId);
+  }).catch(function(){toast('Failed!','err');});
 }
 
 function toggleProfilePrivacy(isPublic){
   fetch(API+'/profile/'+D.myId+'/privacy',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({public:isPublic})})
   .then(function(){toast(isPublic?'Profile set to public!':'Profile set to private!');})
+  .catch(function(){toast('Failed!','err');});
+}
+
+function addRole(uid){
+  var name=document.getElementById('ri-'+uid).value.trim();
+  var color=document.getElementById('rc-'+uid).value;
+  if(!name){toast('Enter a role name!','err');return;}
+  fetch(API+'/roles',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid,role_name:name,color:color})})
+  .then(function(){document.getElementById('ri-'+uid).value='';loadUserRoles(uid);toast('Role added!');})
+  .catch(function(){toast('Failed!','err');});
+}
+
+function loadUserRoles(uid){
+  fetch(API+'/roles/'+uid).then(function(r){return r.json();}).then(function(roles){
+    var el=document.getElementById('roles-'+uid);
+    if(!el) return;
+    var html='';
+    for(var i=0;i<roles.length;i++){
+      var r=roles[i];
+      html+='<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+r.color+'22;color:'+r.color+';border:1px solid '+r.color+'44;cursor:pointer;" onclick="delRole(\''+uid+'\',\''+r.role_name+'\')" title="Click to remove">'+r.role_name+' ×</span>';
+    }
+    el.innerHTML=html||'<span style="font-size:11px;color:var(--text3);">No roles</span>';
+  }).catch(function(){});
+}
+
+function delRole(uid,name){
+  if(!confirm('Remove role '+name+'?')) return;
+  fetch(API+'/roles/'+uid+'/'+encodeURIComponent(name),{method:'DELETE'})
+  .then(function(){loadUserRoles(uid);toast('Role removed.');})
   .catch(function(){toast('Failed!','err');});
 }
 
