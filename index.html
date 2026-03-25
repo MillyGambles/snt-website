@@ -230,29 +230,32 @@ h1 .hi{color:var(--accent);}
 </div>
 
 <div class="pg on" id="pg-lb">
-  <div class="hero">
+  <div class="hero" style="display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;">
+  <div>
     <div class="eyebrow"><span class="dot live"></span>LIVE RANKINGS</div>
     <h1>Invite. Earn.<br/><span class="hi">Rise.</span></h1>
     <p class="hero-sub">Every invite earns 100 points. Climb the leaderboard, unlock rewards and claim your SNT chain.</p>
   </div>
+  <div id="hero-rotator" style="flex:1;min-width:260px;max-width:420px;display:none;">
+    <div id="hero-slide-event" style="background:var(--s1);border:1px solid var(--accent-border);border-radius:14px;padding:20px 24px;display:none;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent-l);margin-bottom:8px;display:flex;align-items:center;gap:6px;"><span class="dot live"></span>LIVE EVENT</div>
+      <div id="hero-event-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
+      <div id="hero-event-desc" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+      <div style="font-size:12px;color:var(--accent-l);font-weight:600;margin-top:10px;">View event →</div>
+    </div>
+    <div id="hero-slide-ann" style="background:var(--s1);border:1px solid var(--b1);border-radius:14px;padding:20px 24px;display:none;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text2);margin-bottom:8px;">📢 ANNOUNCEMENT</div>
+      <div id="hero-ann-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:6px;"></div>
+      <div id="hero-ann-content" style="font-size:12px;color:var(--text2);line-height:1.6;"></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:10px;justify-content:center;" id="hero-dots"></div>
+  </div>
+</div>
   <div class="stats">
     <div class="stat"><div class="stat-n" id="s-inv">0</div><div class="stat-l">Total invites all time</div></div>
     <div class="stat"><div class="stat-n" id="s-mem">0</div><div class="stat-l">Active inviters</div></div>
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
-  <div class="wrap" id="ann-wrap" style="display:none;padding-bottom:0;margin-bottom:0;">
-  <div id="ann-feed" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
-</div>
-  <div class="wrap" id="event-banner-wrap" style="display:none;padding-bottom:0;margin-bottom:0;">
-  <div id="event-banner" style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
-    <span class="dot live"></span>
-    <div>
-      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent-l);margin-bottom:2px;">LIVE EVENT</div>
-      <div style="font-size:14px;font-weight:600;color:var(--text);" id="event-banner-title">Loading...</div>
-    </div>
-    <div style="margin-left:auto;font-size:12px;color:var(--accent-l);font-weight:600;">View →</div>
-  </div>
-</div>
   <div class="wrap">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div>
     <div class="sec-head">
@@ -1038,11 +1041,7 @@ fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){docu
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
   D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});
-  var live=D.events.find(function(e){return e.status==='live';});
-  if(live){
-    document.getElementById('event-banner-title').textContent=live.title;
-    document.getElementById('event-banner-wrap').style.display='block';
-  }
+  loadHeroRotator();
 }).catch(function(){});
 
 // ─── THEME SYSTEM ─────────────────────────────────────────────────────────────
@@ -1271,61 +1270,6 @@ function setRadius(r){
   toast('Border style: '+r.name);
 }
 
-function toggleAnim(on){
-  var canvas=document.getElementById('anim-canvas');
-  if(on){
-    canvas.style.display='block';
-    startAnim(canvas);
-  } else {
-    canvas.style.display='none';
-    if(animFrame) cancelAnimationFrame(animFrame);
-    animRunning=false;
-  }
-  fetch(API+'/settings/anim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:on})}).catch(function(){});
-}
-
-function startAnim(canvas){
-  if(animRunning) return;
-  animRunning=true;
-  var ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-  var pts=[];
-  for(var i=0;i<60;i++){
-    pts.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.4,vy:(Math.random()-0.5)*0.4,r:Math.random()*2+1});
-  }
-  function frame(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    var acc=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||'#3b82f6';
-    ctx.fillStyle=acc;
-    ctx.strokeStyle=acc;
-    for(var i=0;i<pts.length;i++){
-      var p=pts[i];
-      p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0||p.x>canvas.width) p.vx*=-1;
-      if(p.y<0||p.y>canvas.height) p.vy*=-1;
-      ctx.beginPath();
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
-      for(var j=i+1;j<pts.length;j++){
-        var q=pts[j];
-        var d=Math.hypot(p.x-q.x,p.y-q.y);
-        if(d<120){
-          ctx.globalAlpha=(1-d/120)*0.15;
-          ctx.beginPath();
-          ctx.moveTo(p.x,p.y);
-          ctx.lineTo(q.x,q.y);
-          ctx.stroke();
-          ctx.globalAlpha=1;
-        }
-      }
-    }
-    animFrame=requestAnimationFrame(frame);
-  }
-  frame();
-  window.addEventListener('resize',function(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;});
-}
-
 fetch(API+'/theme').then(function(r){return r.json();}).then(function(p){
   if(p&&p.accent) applyPreset(p);
 }).catch(function(){});
@@ -1373,26 +1317,56 @@ function buildThemeUI(){
 buildThemeUI();
 
 // ─── ANNOUNCEMENTS ────────────────────────────────────────────────────────────
-function loadAnn(){
-  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
-    if(!data.length) return;
-    document.getElementById('ann-wrap').style.display='block';
-    var html='';
-    for(var i=0;i<data.length;i++){
-      var a=data[i];
-      var date=new Date(a.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
-      html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 20px;">'+
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'+
-        '<div style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;">'+a.title+'</div>'+
-        '<div style="font-size:11px;color:var(--text3);">'+date+'</div>'+
-        '</div>'+
-        (a.content?'<div style="font-size:13px;color:var(--text2);line-height:1.6;">'+a.content+'</div>':'')+
-        '</div>';
-    }
-    document.getElementById('ann-feed').innerHTML=html;
-  }).catch(function(){});
+// Hero rotator
+var heroSlides=[];
+var heroIdx=0;
+var heroTimer=null;
+
+function heroShow(idx){
+  heroIdx=idx;
+  document.getElementById('hero-slide-event').style.display='none';
+  document.getElementById('hero-slide-ann').style.display='none';
+  var slide=heroSlides[idx];
+  if(!slide) return;
+  if(slide.type==='event'){
+    document.getElementById('hero-slide-event').style.display='block';
+    document.getElementById('hero-event-title').textContent=slide.title;
+    document.getElementById('hero-event-desc').textContent=slide.desc||'';
+  } else {
+    document.getElementById('hero-slide-ann').style.display='block';
+    document.getElementById('hero-ann-title').textContent=slide.title;
+    document.getElementById('hero-ann-content').textContent=slide.content||'';
+  }
+  // dots
+  var dots=document.getElementById('hero-dots');
+  dots.innerHTML='';
+  for(var i=0;i<heroSlides.length;i++){
+    var d=document.createElement('div');
+    d.style.cssText='width:6px;height:6px;border-radius:50%;background:'+(i===idx?'var(--accent)':'var(--b2)')+';transition:background 0.3s;cursor:pointer;';
+    d.setAttribute('data-i',i);
+    d.onclick=(function(n){return function(){clearInterval(heroTimer);heroShow(n);heroTimer=setInterval(function(){heroShow((heroIdx+1)%heroSlides.length);},10000);};})(i);
+    dots.appendChild(d);
+  }
 }
 
+function loadHeroRotator(){
+  var liveEvent=D.events.find(function(e){return e.status==='live';});
+  if(liveEvent) heroSlides.push({type:'event',title:liveEvent.title,desc:liveEvent.desc});
+  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
+    data.forEach(function(a){heroSlides.push({type:'ann',title:a.title,content:a.content});});
+    if(heroSlides.length>0){
+      document.getElementById('hero-rotator').style.display='block';
+      heroShow(0);
+      if(heroSlides.length>1) heroTimer=setInterval(function(){heroShow((heroIdx+1)%heroSlides.length);},10000);
+    }
+    // also populate ann-feed for admin
+  }).catch(function(){
+    if(heroSlides.length>0){
+      document.getElementById('hero-rotator').style.display='block';
+      heroShow(0);
+    }
+  });
+}
 function rAnnTbl(){
   fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
     var html='';
@@ -1414,7 +1388,8 @@ function addAnn(){
     document.getElementById('ann-title').value='';
     document.getElementById('ann-content').value='';
     rAnnTbl();
-    loadAnn();
+    heroSlides=[];
+    loadHeroRotator();
     toast('Announcement posted!');
   }).catch(function(){toast('Failed!','err');});
 }
@@ -1422,11 +1397,15 @@ function addAnn(){
 function delAnn(id){
   if(!confirm('Delete this announcement?')) return;
   fetch(API+'/announcements/'+id,{method:'DELETE'})
-  .then(function(){rAnnTbl();loadAnn();toast('Deleted.');})
+  .then(function(){rAnnTbl();heroSlides=[];loadHeroRotator();toast('Deleted.');})
   .catch(function(){toast('Failed!','err');});
 }
 
-loadAnn();
+function loadAnn(){
+  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
+    // feed used by admin only now
+  }).catch(function(){});
+}
 
 // ─── CASINO ───────────────────────────────────────────────────────────────────
 var cBal=parseInt(localStorage.getItem('snt_pts')||'0');
