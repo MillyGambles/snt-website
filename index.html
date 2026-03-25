@@ -1487,7 +1487,7 @@ function loadProfile(userId){
     }
     document.getElementById('prof-roles-display').innerHTML=rolesHtml;
     // name
-    document.getElementById('prof-name').innerHTML=(isOwn?'Your<br/>':'')+'<span class="hi">'+u.username+'</span>';
+    document.getElementById('prof-name').innerHTML=(isOwn?'<br/>':'')+'<span class="hi">'+u.username+'</span>';
     document.getElementById('prof-sub').textContent=isOwn?'Your stats, badges and claim history.':u.username+'\'s profile.';
     // privacy toggle
     var pb=document.getElementById('prof-privacy-box');
