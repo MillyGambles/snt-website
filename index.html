@@ -205,7 +205,8 @@ h1 .hi{color:var(--accent);}
     <button class="tab" onclick="go('ev',this)">Events</button>
     <button class="tab" onclick="go('sh',this)">Shop</button>
     <button class="tab" onclick="go('casino',this)">Casino</button>
-    <button class="tab" onclick="goAdmin(this)">Admin</button>
+    <button class="tab" onclick="goProfile(this)">Profile</button>
+<button class="tab" onclick="goAdmin(this)">Admin</button>
   </div>
   <div class="nav-r">
     <button class="btn btn-blue" onclick="window.location.href='https://snt-backend-production.up.railway.app/auth/discord'" id="login-btn">Login with Discord</button>
@@ -226,7 +227,8 @@ h1 .hi{color:var(--accent);}
   <button class="mob-tab" onclick="go('ev',this,1)">Events</button>
   <button class="mob-tab" onclick="go('sh',this,1)">Shop</button>
   <button class="mob-tab" onclick="go('casino',this,1)">Casino</button>
-  <button class="mob-tab" onclick="goAdminMob(this)">Admin</button>
+  <button class="mob-tab" onclick="goProfileMob(this)">Profile</button>
+<button class="mob-tab" onclick="goAdminMob(this)">Admin</button>
 </div>
 
 <div class="pg on" id="pg-lb">
@@ -458,6 +460,44 @@ h1 .hi{color:var(--accent);}
   </div>
   
 </div>
+<div class="pg" id="pg-profile">
+  <div class="hero" style="display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap;">
+    <div>
+      <div class="eyebrow"><span class="dot"></span>PROFILE</div>
+      <h1 id="prof-name">Your<br/><span class="hi">Profile.</span></h1>
+      <p class="hero-sub" id="prof-sub">View your stats, badges and claim history.</p>
+    </div>
+    <div id="prof-avatar-wrap" style="display:none;">
+      <img id="prof-avatar-img" style="width:96px;height:96px;border-radius:50%;border:3px solid var(--accent-border);"/>
+    </div>
+  </div>
+  <div class="wrap">
+    <div id="prof-private-msg" style="display:none;background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:40px;text-align:center;color:var(--text2);">
+      <div style="font-size:32px;margin-bottom:12px;">🔒</div>
+      <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;">This profile is private.</div>
+      <div style="font-size:13px;">This user has set their profile to private.</div>
+    </div>
+    <div id="prof-content">
+      <!-- STATS -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px;" id="prof-stats"></div>
+      <!-- PRIVACY TOGGLE (only shown on own profile) -->
+      <div id="prof-privacy-box" style="display:none;background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:13px;font-weight:600;">Public Profile</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px;">When off, only you can see your profile.</div>
+        </div>
+        <label class="tog"><input type="checkbox" id="prof-pub-tog" onchange="toggleProfilePrivacy(this.checked)"/><span class="tog-s"></span></label>
+      </div>
+      <!-- BADGES -->
+      <div class="sec-head"><div><div class="sec-title">Badges</div><div class="sec-sub" id="prof-badge-sub"></div></div></div>
+      <div id="prof-badges" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px;"></div>
+      <!-- CLAIMS -->
+      <div class="sec-head"><div><div class="sec-title">Claim History</div></div></div>
+      <div id="prof-claims" style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:32px;"></div>
+    </div>
+  </div>
+</div>
+
 <div class="pg" id="pg-casino">
   <div style="max-width:1140px;margin:0 auto;padding:0 32px 60px;">
     <div class="hero" style="padding:52px 0 36px;">
@@ -715,7 +755,7 @@ function rLB(){
       var avatar=u.avatar&&u.id?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=64" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display=\'none\'">':init;
       html+='<div class="lb-row" style="grid-template-columns:52px 1fr 100px;">'+
         '<span class="rk '+rCls+'">'+rNum+'</span>'+
-        '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+avatar+'</div><span class="uname">'+u.name+'</span></div>'+
+        '<div class="urow"><div class="av" style="background:'+ac.bg+';color:'+ac.c+';overflow:hidden;padding:0;">'+avatar+'</div><span class="uname" style="cursor:pointer;" onclick="viewProfile(\''+u.id+'\')">'+u.name+'</span></div>'+
         '<span class="pts-n">'+u[valueKey].toLocaleString()+'</span>'+
         '</div>';
     }
@@ -1344,6 +1384,135 @@ function loadHistory(){
     }
     document.getElementById('history-rows').innerHTML=html;
   }).catch(function(){document.getElementById('history-rows').innerHTML='<div class="empty">Failed to load.</div>';});
+}
+
+// ─── PROFILE ──────────────────────────────────────────────────────────────────
+var BADGE_DEFS=[
+  {key:'first_invite',label:'First Blood',desc:'Got your first invite',emoji:'🩸'},
+  {key:'invites_5',label:'Getting Started',desc:'5 invites',emoji:'🌱'},
+  {key:'invites_10',label:'Recruiter',desc:'10 invites',emoji:'📣'},
+  {key:'invites_25',label:'Grinder',desc:'25 invites',emoji:'⚙️'},
+  {key:'invites_50',label:'SNT Soldier',desc:'50 invites',emoji:'🎖️'},
+  {key:'invites_100',label:'Legend',desc:'100 invites',emoji:'👑'},
+  {key:'points_1000',label:'Stack Up',desc:'Reached 1,000 points',emoji:'💰'},
+  {key:'points_5000',label:'Big Bag',desc:'Reached 5,000 points',emoji:'💎'},
+  {key:'points_10000',label:'Whale',desc:'Reached 10,000 points',emoji:'🐋'},
+  {key:'og',label:'OG',desc:'One of the first 10 members',emoji:'🏆'},
+];
+
+var currentProfileId=null;
+
+function goProfile(btn){
+  if(!D.myId){toast('Login with Discord first!','err');return;}
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.mob-tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-profile').classList.add('on');
+  btn.classList.add('on');
+  loadProfile(D.myId);
+}
+
+function goProfileMob(btn){
+  if(!D.myId){toast('Login with Discord first!','err');return;}
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.querySelectorAll('.mob-tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-profile').classList.add('on');
+  btn.classList.add('on');
+  document.getElementById('mob').classList.remove('on');
+  loadProfile(D.myId);
+}
+
+function viewProfile(userId){
+  document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(b){b.classList.remove('on');});
+  document.getElementById('pg-profile').classList.add('on');
+  loadProfile(userId);
+}
+
+function loadProfile(userId){
+  currentProfileId=userId;
+  var isOwn=userId===D.myId;
+  document.getElementById('prof-content').style.display='block';
+  document.getElementById('prof-private-msg').style.display='none';
+  document.getElementById('prof-stats').innerHTML='<div class="empty">Loading...</div>';
+  document.getElementById('prof-badges').innerHTML='';
+  document.getElementById('prof-claims').innerHTML='';
+  fetch(API+'/profile/'+userId).then(function(r){return r.json();}).then(function(data){
+    if(data.error){document.getElementById('prof-stats').innerHTML='<div class="empty">User not found.</div>';return;}
+    if(!data.user.profile_public&&!isOwn){
+      document.getElementById('prof-content').style.display='none';
+      document.getElementById('prof-private-msg').style.display='block';
+      return;
+    }
+    var u=data.user;
+    // avatar
+    if(u.avatar){
+      document.getElementById('prof-avatar-img').src='https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=128';
+      document.getElementById('prof-avatar-wrap').style.display='block';
+    }
+    // name
+    document.getElementById('prof-name').innerHTML=(isOwn?'Your':'')+'<br/><span class="hi">'+u.username+'</span>';
+    document.getElementById('prof-sub').textContent=isOwn?'Your stats, badges and claim history.':u.username+'\'s profile.';
+    // privacy toggle
+    var pb=document.getElementById('prof-privacy-box');
+    if(isOwn){pb.style.display='flex';document.getElementById('prof-pub-tog').checked=u.profile_public==1;}
+    else{pb.style.display='none';}
+    // stats
+    var joined=u.joined_at?new Date(u.joined_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'Unknown';
+    var stats=[
+      {label:'Invites',val:u.total_invites,icon:'📨'},
+      {label:'Points',val:u.points.toLocaleString(),icon:'💎'},
+      {label:'Invite Rank',val:'#'+data.invRank,icon:'🏆'},
+      {label:'Points Rank',val:'#'+data.ptsRank,icon:'⭐'},
+      {label:'Joined',val:joined,icon:'📅'},
+      {label:'Badges',val:data.badges.length,icon:'🎖️'},
+    ];
+    var sh='';
+    for(var i=0;i<stats.length;i++){
+      sh+='<div class="stat"><div class="stat-n" style="font-size:20px;">'+stats[i].icon+' '+stats[i].val+'</div><div class="stat-l">'+stats[i].label+'</div></div>';
+    }
+    document.getElementById('prof-stats').innerHTML=sh;
+    // badges
+    var bh='';
+    var earned=data.badges;
+    for(var i=0;i<BADGE_DEFS.length;i++){
+      var bd=BADGE_DEFS[i];
+      var has=earned.indexOf(bd.key)>-1;
+      bh+='<div style="background:var(--s1);border:1px solid '+(has?'var(--accent-border)':'var(--b1)')+';border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;opacity:'+(has?'1':'0.35')+';">'+
+        '<div style="font-size:28px;">'+bd.emoji+'</div>'+
+        '<div><div style="font-size:13px;font-weight:700;color:'+(has?'var(--text)':'var(--text2)')+';">'+bd.label+'</div>'+
+        '<div style="font-size:11px;color:var(--text2);">'+bd.desc+'</div>'+
+        (has?'<div style="font-size:10px;color:var(--accent-l);margin-top:2px;font-weight:600;">UNLOCKED</div>':'<div style="font-size:10px;color:var(--text3);margin-top:2px;">LOCKED</div>')+
+        '</div></div>';
+    }
+    document.getElementById('prof-badges').innerHTML=bh||'<div class="empty">No badges yet.</div>';
+    document.getElementById('prof-badge-sub').textContent=earned.length+' / '+BADGE_DEFS.length+' unlocked';
+    // claims
+    var ch='';
+    var sc={pending:'#f59e0b',delivered:'#22c55e',rejected:'#ef4444'};
+    if(data.claims.length===0){ch='<div class="empty">No claims yet.</div>';}
+    else{
+      for(var i=0;i<data.claims.length;i++){
+        var c=data.claims[i];
+        var date=new Date(c.claimed_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+        ch+='<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--b1);">'+
+          '<div style="display:flex;align-items:center;gap:10px;">'+
+          '<div style="font-size:22px;">'+(c.icon||'🎁')+'</div>'+
+          '<div><div style="font-size:13px;font-weight:600;">'+c.item_name+'</div>'+
+          '<div style="font-size:11px;color:var(--text2);">'+date+'</div></div></div>'+
+          '<div style="font-size:11px;font-weight:700;color:'+sc[c.status]+';background:'+sc[c.status]+'18;border:1px solid '+sc[c.status]+'40;padding:3px 10px;border-radius:99px;">'+c.status.toUpperCase()+'</div>'+
+          '</div>';
+      }
+    }
+    document.getElementById('prof-claims').innerHTML=ch;
+  }).catch(function(){document.getElementById('prof-stats').innerHTML='<div class="empty">Failed to load profile.</div>';});
+}
+
+function toggleProfilePrivacy(isPublic){
+  fetch(API+'/profile/'+D.myId+'/privacy',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({public:isPublic})})
+  .then(function(){toast(isPublic?'Profile set to public!':'Profile set to private!');})
+  .catch(function(){toast('Failed!','err');});
 }
 
 buildThemeUI();
