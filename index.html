@@ -236,10 +236,20 @@ h1 .hi{color:var(--accent);}
     <p class="hero-sub">Every invite earns 100 points. Climb the leaderboard, unlock rewards and claim your SNT chain.</p>
   </div>
   <div class="stats">
-    <div class="stat"><div class="stat-n" id="s-inv">0</div><div class="stat-l">Total invites this month</div></div>
+    <div class="stat"><div class="stat-n" id="s-inv">0</div><div class="stat-l">Total invites all time</div></div>
     <div class="stat"><div class="stat-n" id="s-mem">0</div><div class="stat-l">Active inviters</div></div>
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
+  <div class="wrap" id="event-banner-wrap" style="display:none;padding-bottom:0;margin-bottom:0;">
+  <div id="event-banner" style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
+    <span class="dot live"></span>
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--accent-l);margin-bottom:2px;">LIVE EVENT</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);" id="event-banner-title">Loading...</div>
+    </div>
+    <div style="margin-left:auto;font-size:12px;color:var(--accent-l);font-weight:600;">View →</div>
+  </div>
+</div>
   <div class="wrap">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div>
     <div class="sec-head">
@@ -818,7 +828,14 @@ function logoutUser(){
 fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data){D.users=data.map(function(u){return {id:u.id,name:u.username,avatar:u.avatar,pts:u.points,inv:u.total_invites};});rLB();}).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
-fetch(API+'/events').then(function(r){return r.json();}).then(function(data){D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});}).catch(function(){});
+fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
+  D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});
+  var live=D.events.find(function(e){return e.status==='live';});
+  if(live){
+    document.getElementById('event-banner-title').textContent=live.title;
+    document.getElementById('event-banner-wrap').style.display='block';
+  }
+}).catch(function(){});
 
 // ─── THEME SYSTEM ─────────────────────────────────────────────────────────────
 var PRESETS = [
