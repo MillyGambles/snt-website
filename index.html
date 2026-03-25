@@ -931,6 +931,7 @@ function toggleAnim(on){
     if(animFrame) cancelAnimationFrame(animFrame);
     animRunning=false;
   }
+  fetch(API+'/settings/anim',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({value:on})}).catch(function(){});
 }
 
 function startAnim(canvas){
@@ -977,6 +978,12 @@ function startAnim(canvas){
 
 fetch(API+'/theme').then(function(r){return r.json();}).then(function(p){
   if(p&&p.accent) applyPreset(p);
+}).catch(function(){});
+fetch(API+'/settings/anim').then(function(r){return r.json();}).then(function(data){
+  if(data && data.value === true){
+    document.getElementById('t-anim').checked = true;
+    toggleAnim(true);
+  }
 }).catch(function(){});
 function buildThemeUI(){
   var pg=document.getElementById('preset-grid');
