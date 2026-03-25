@@ -177,6 +177,11 @@ h1 .hi{color:var(--accent);}
   .lb-row{grid-template-columns:44px 1fr 90px 90px !important;}
   .hpz,.cpz{display:none;}
 }
+@media(max-width:860px){
+  .wrap > div[style*="grid-template-columns:1fr 1fr"]{
+    grid-template-columns:1fr !important;
+  }
+}
 @media(max-width:600px){
   #nav{padding:0 16px;gap:0;}
   .tabs{display:none;}
