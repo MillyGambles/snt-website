@@ -262,7 +262,7 @@ h1 .hi{color:var(--accent);}
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
   <div class="wrap">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
       <div>
         <div class="sec-head">
           <div><div class="sec-title">Top Inviters</div><div class="sec-sub">Most invites all time</div></div>
@@ -785,7 +785,6 @@ html+='<div class="lb-row" style="grid-template-columns:52px 1fr 100px;">'+
   var ti=D.users.reduce(function(acc,u){return acc+u.inv;},0);
   document.getElementById('s-inv').textContent=ti;
   document.getElementById('s-mem').textContent=D.users.length;
-  document.getElementById('s-clm').textContent=D.claims.filter(function(c){return c.status==='delivered';}).length;
 }
 
 function rEV(){
