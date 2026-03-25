@@ -240,6 +240,9 @@ h1 .hi{color:var(--accent);}
     <div class="stat"><div class="stat-n" id="s-mem">0</div><div class="stat-l">Active inviters</div></div>
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
+  <div class="wrap" id="ann-wrap" style="display:none;padding-bottom:0;margin-bottom:0;">
+  <div id="ann-feed" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
+</div>
   <div class="wrap" id="event-banner-wrap" style="display:none;padding-bottom:0;margin-bottom:0;">
   <div id="event-banner" style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:14px;margin-bottom:20px;cursor:pointer;" onclick="go('ev',document.querySelector('.tab:nth-child(2)'))">
     <span class="dot live"></span>
@@ -313,6 +316,7 @@ h1 .hi{color:var(--accent);}
         <button class="adm-btn" onclick="adm('events',this)">Events</button>
         <button class="adm-btn" onclick="adm('users',this)">Users</button>
         <button class="adm-btn" onclick="adm('claims',this)">Claims</button>
+        <button class="adm-btn" onclick="adm('announcements',this)">Announcements</button>
         <button class="adm-btn" onclick="adm('theme',this)">Theme</button>
       </div>
       <div>
@@ -356,6 +360,15 @@ h1 .hi{color:var(--accent);}
           <div class="adm-title">Reward Claims</div>
           <div class="tbl"><table><thead><tr><th>USER</th><th>ITEM</th><th>DATE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="cl-tbl"></tbody></table></div>
         </div>
+        <div class="adm-panel" id="ap-announcements">
+  <div class="adm-title">Announcements</div>
+  <div class="form-box">
+    <div class="fg"><label>TITLE</label><input id="ann-title" placeholder="e.g. New rewards added!"/></div>
+    <div class="fg"><label>MESSAGE</label><textarea id="ann-content" placeholder="Write your announcement here..."></textarea></div>
+    <div class="form-row"><button class="btn btn-blue" onclick="addAnn()">Post Announcement</button></div>
+  </div>
+  <div class="tbl"><table><thead><tr><th>TITLE</th><th>DATE</th><th>ACTIONS</th></tr></thead><tbody id="ann-tbl"></tbody></table></div>
+</div>
         <div class="adm-panel" id="ap-theme">
           <div class="adm-title">Theme & Appearance</div>
 
@@ -658,7 +671,7 @@ function go(id,btn,mob){
   if(id==='lb') rLB();
   if(id==='ev') rEV();
   if(id==='sh') rSH();
-  if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();}
+  if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();rAnnTbl();}
   if(id==='casino'){cBal=parseInt(localStorage.getItem('snt_pts')||'0');document.getElementById('casino-bal').textContent=cBal.toLocaleString();}
 }
 
@@ -1358,6 +1371,63 @@ function buildThemeUI(){
 }
 
 buildThemeUI();
+
+// ─── ANNOUNCEMENTS ────────────────────────────────────────────────────────────
+function loadAnn(){
+  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
+    if(!data.length) return;
+    document.getElementById('ann-wrap').style.display='block';
+    var html='';
+    for(var i=0;i<data.length;i++){
+      var a=data[i];
+      var date=new Date(a.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      html+='<div style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px 20px;">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'+
+        '<div style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;">'+a.title+'</div>'+
+        '<div style="font-size:11px;color:var(--text3);">'+date+'</div>'+
+        '</div>'+
+        (a.content?'<div style="font-size:13px;color:var(--text2);line-height:1.6;">'+a.content+'</div>':'')+
+        '</div>';
+    }
+    document.getElementById('ann-feed').innerHTML=html;
+  }).catch(function(){});
+}
+
+function rAnnTbl(){
+  fetch(API+'/announcements').then(function(r){return r.json();}).then(function(data){
+    var html='';
+    for(var i=0;i<data.length;i++){
+      var a=data[i];
+      var date=new Date(a.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      html+='<tr><td><b>'+a.title+'</b>'+(a.content?'<br/><span style="font-size:12px;color:var(--text2);">'+a.content.substring(0,60)+(a.content.length>60?'...':'')+'</span>':'')+'</td><td style="color:var(--text2);">'+date+'</td><td><button class="btn btn-sm btn-red" onclick="delAnn('+a.id+')">Delete</button></td></tr>';
+    }
+    document.getElementById('ann-tbl').innerHTML=html||'<tr><td colspan="3" class="empty">No announcements yet.</td></tr>';
+  }).catch(function(){});
+}
+
+function addAnn(){
+  var t=document.getElementById('ann-title').value.trim();
+  var c=document.getElementById('ann-content').value.trim();
+  if(!t){toast('Enter a title!','err');return;}
+  fetch(API+'/announcements',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,content:c})})
+  .then(function(){
+    document.getElementById('ann-title').value='';
+    document.getElementById('ann-content').value='';
+    rAnnTbl();
+    loadAnn();
+    toast('Announcement posted!');
+  }).catch(function(){toast('Failed!','err');});
+}
+
+function delAnn(id){
+  if(!confirm('Delete this announcement?')) return;
+  fetch(API+'/announcements/'+id,{method:'DELETE'})
+  .then(function(){rAnnTbl();loadAnn();toast('Deleted.');})
+  .catch(function(){toast('Failed!','err');});
+}
+
+loadAnn();
+
 // ─── CASINO ───────────────────────────────────────────────────────────────────
 var cBal=parseInt(localStorage.getItem('snt_pts')||'0');
 var cRlBet='',cBacSel='',cCupBall=-1,cCupPhase='idle',cCupBetAmt=0;
