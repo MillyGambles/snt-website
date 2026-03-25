@@ -241,13 +241,25 @@ h1 .hi{color:var(--accent);}
     <div class="stat"><div class="stat-n" id="s-clm">0</div><div class="stat-l">Rewards claimed</div></div>
   </div>
   <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;"><div>
     <div class="sec-head">
-      <div><div class="sec-title">Top Inviters</div><div class="sec-sub">1 invite = 100 points · updates live</div></div>
-      <div class="chip">March 2026</div>
+      <div><div class="sec-title">Top Inviters</div><div class="sec-sub">Most invites all time</div></div>
     </div>
     <div class="lb">
-      <div class="lb-head"><span>RANK</span><span>USER</span><span class="hiv">INVITES</span><span>POINTS</span></div>
-      <div id="lb-inv-rows"></div></div></div><div><div class="sec-head"><div><div class="sec-title">Top Points</div><div class="sec-sub">Highest points balance</div></div></div><div class="lb"><div class="lb-head" style="grid-template-columns:52px 1fr 100px;"><span>RANK</span><span>USER</span><span>POINTS</span></div><div id="lb-pts-rows"></div></div></div></div>
+      <div class="lb-head" style="grid-template-columns:52px 1fr 100px;"><span>RANK</span><span>USER</span><span>INVITES</span></div>
+      <div id="lb-inv-rows"></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head">
+          <div><div class="sec-title">Top Points</div><div class="sec-sub">Highest points balance</div></div>
+        </div>
+        <div class="lb">
+          <div class="lb-head" style="grid-template-columns:52px 1fr 100px;"><span>RANK</span><span>USER</span><span>POINTS</span></div>
+          <div id="lb-pts-rows"></div>
+        </div>
+      </div>
+    </div>
     </div>
   </div>
 </div>
