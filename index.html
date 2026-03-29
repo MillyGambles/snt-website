@@ -625,8 +625,20 @@ h1 .hi{color:var(--accent);}
     <!-- HOW IT WORKS -->
     <div class="form-box" style="margin-bottom:32px;text-align:center;">
       <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:20px;">How it works</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">1️⃣</div><div><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any crypto address below or donate Robux via Pls Donate.</div></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:700px;margin:0 auto;">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+    <div style="font-size:32px;">1️⃣</div>
+    <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any crypto address below or donate Robux via Pls Donate.</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+    <div style="font-size:32px;">2️⃣</div>
+    <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">DM Milly with proof</div><div style="font-size:12px;color:var(--text2);">Send your transaction hash or screenshot on Discord.</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;">
+    <div style="font-size:32px;">3️⃣</div>
+    <div style="text-align:center;"><div style="font-size:13px;font-weight:600;">Get your badge</div><div style="font-size:12px;color:var(--text2);">You'll receive the 💸 Donator badge on your profile.</div></div>
+  </div>
+</div><div style="font-size:32px;">1️⃣</div><div><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any crypto address below or donate Robux via Pls Donate.</div></div></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">2️⃣</div><div><div style="font-size:13px;font-weight:600;">DM Milly with proof</div><div style="font-size:12px;color:var(--text2);">Send your transaction hash or screenshot on Discord.</div></div></div>
         <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">3️⃣</div><div><div style="font-size:13px;font-weight:600;">Get your badge</div><div style="font-size:12px;color:var(--text2);">You'll receive the 💸 Donator badge on your profile.</div></div></div>
       </div>
@@ -637,23 +649,23 @@ h1 .hi{color:var(--accent);}
         <div class="sec-head"><div><div class="sec-title">Crypto Donations</div><div class="sec-sub">Click any address to copy</div></div></div>
         <div style="display:flex;flex-direction:column;gap:10px;">
           <div class="form-box" style="padding:16px 20px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/solana-sol-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Solana</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://assets.coingecko.com/coins/images/4128/small/solana.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Solana</div></div>
             <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('9Sihjh9Ee16zgfSBq42LD4zRfkMcAjNezfrXBs43byNi')">9Sihjh9Ee16zgfSBq42LD4zRfkMcAjNezfrXBs43byNi</div>
           </div>
           <div class="form-box" style="padding:16px 20px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Bitcoin</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://assets.coingecko.com/coins/images/1/small/bitcoin.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Bitcoin</div></div>
             <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('bc1q6dryspfdwxd9yrs6k0a93z8yus70dumesnhv0m')">bc1q6dryspfdwxd9yrs6k0a93z8yus70dumesnhv0m</div>
           </div>
           <div class="form-box" style="padding:16px 20px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Ethereum</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://assets.coingecko.com/coins/images/279/small/ethereum.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Ethereum</div></div>
             <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('0xBB6a3Ca8A628C38Bc7186bF232F58E859cd0D552')">0xBB6a3Ca8A628C38Bc7186bF232F58E859cd0D552</div>
           </div>
           <div class="form-box" style="padding:16px 20px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/litecoin-ltc-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Litecoin</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://assets.coingecko.com/coins/images/2/small/litecoin.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Litecoin</div></div>
             <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('LQstWCLpd6iwpbrT2uj75eS3KTF12Xizmc')">LQstWCLpd6iwpbrT2uj75eS3KTF12Xizmc</div>
           </div>
           <div class="form-box" style="padding:16px 20px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/cardano-ada-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Cardano</div></div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://assets.coingecko.com/coins/images/975/small/cardano.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Cardano</div></div>
             <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('addr1qx2vmh9f0lsn8hkrum88wfl682a227k8xn6llhd7awa2uy55ehw2jllpx00v8ekwwunl5w4654avwd84llwma6a64cfqd9ld35')">addr1qx2vmh9f0lsn8hkrum88wfl682a227k8xn6llhd7awa2uy55ehw2jllpx00v8ekwwunl5w4654avwd84llwma6a64cfqd9ld35</div>
           </div>
         </div>
@@ -1895,8 +1907,13 @@ function loadDonations(){
       var d=data.crypto[i];
       var rCls=i<3?rkC[i]:'rkn';
       var rNum=i<9?'0'+(i+1):''+(i+1);
-      var cryptoLogos={SOL:'https://cryptologos.cc/logos/solana-sol-logo.png',BTC:'https://cryptologos.cc/logos/bitcoin-btc-logo.png',ETH:'https://cryptologos.cc/logos/ethereum-eth-logo.png',LTC:'https://cryptologos.cc/logos/litecoin-ltc-logo.png',ADA:'https://cryptologos.cc/logos/cardano-ada-logo.png'};
-var cLogo=cryptoLogos[d.crypto]?'<img src="'+cryptoLogos[d.crypto]+'" style="width:16px;height:16px;border-radius:50%;vertical-align:middle;margin-right:3px;"/>':'';
+var cryptoLogos={
+  SOL:'https://assets.coingecko.com/coins/images/4128/small/solana.png',
+  BTC:'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
+  ETH:'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+  LTC:'https://assets.coingecko.com/coins/images/2/small/litecoin.png',
+  ADA:'https://assets.coingecko.com/coins/images/975/small/cardano.png'
+};var cLogo=cryptoLogos[d.crypto]?'<img src="'+cryptoLogos[d.crypto]+'" style="width:16px;height:16px;border-radius:50%;vertical-align:middle;margin-right:3px;"/>':'';
 ch+='<div class="lb-row" style="grid-template-columns:44px 1fr 100px 80px;">'+
   '<span class="rk '+rCls+'">'+rNum+'</span>'+
   '<span class="uname">'+d.username+'</span>'+
