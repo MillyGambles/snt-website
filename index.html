@@ -209,6 +209,7 @@ h1 .hi{color:var(--accent);}
     <button class="tab" onclick="go('sh',this)">Shop</button>
     <button class="tab" onclick="go('casino',this)">Casino</button>
     <button class="tab" onclick="goProfile(this)">Profile</button>
+    <button class="tab" onclick="go('donate',this)">Donate</button>
 <button class="tab" onclick="goAdmin(this)">Admin</button>
   </div>
   <div class="nav-r">
@@ -231,6 +232,7 @@ h1 .hi{color:var(--accent);}
   <button class="mob-tab" onclick="go('sh',this,1)">Shop</button>
   <button class="mob-tab" onclick="go('casino',this,1)">Casino</button>
   <button class="mob-tab" onclick="goProfileMob(this)">Profile</button>
+  <button class="mob-tab" onclick="go('donate',this,1)">Donate</button>
 <button class="mob-tab" onclick="goAdminMob(this)">Admin</button>
 </div>
 
@@ -341,6 +343,7 @@ h1 .hi{color:var(--accent);}
         <button class="adm-btn" onclick="adm('announcements',this)">Announcements</button>
         <button class="adm-btn" onclick="adm('theme',this)">Theme</button>
         <button class="adm-btn" onclick="adm('botcontrols',this)">Bot Controls</button>
+        <button class="adm-btn" onclick="adm('donations',this)">Donations</button>
       </div>
       <div>
         <div class="adm-panel on" id="ap-shop">
@@ -383,6 +386,38 @@ h1 .hi{color:var(--accent);}
           <div class="adm-title">Reward Claims</div>
           <div class="tbl"><table><thead><tr><th>USER</th><th>ITEM</th><th>DATE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="cl-tbl"></tbody></table></div>
         </div>
+        <div class="adm-panel" id="ap-donations">
+  <div class="adm-title">Donations</div>
+  <div class="form-box">
+    <div class="adm-title" style="font-size:14px;margin-bottom:12px;">Wallet Addresses</div>
+    <div class="fg2">
+      <div class="fg"><label>CRYPTO</label><input id="da-crypto" placeholder="e.g. Bitcoin, Solana, LTC"/></div>
+      <div class="fg"><label>ADDRESS</label><input id="da-address" placeholder="Your wallet address"/></div>
+    </div>
+    <div class="fg"><label>LABEL (optional)</label><input id="da-label" placeholder="e.g. BTC Wallet"/></div>
+    <div class="form-row"><button class="btn btn-blue" onclick="addDonationAddress()">Add Address</button></div>
+    <div id="da-list" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;"></div>
+  </div>
+  <div class="form-box">
+    <div class="adm-title" style="font-size:14px;margin-bottom:12px;">Log a Donation</div>
+    <div class="fg2">
+      <div class="fg"><label>TYPE</label><select id="don-type"><option value="crypto">Crypto</option><option value="robux">Robux</option></select></div>
+      <div class="fg"><label>USERNAME</label><input id="don-user" placeholder="Discord username"/></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>AMOUNT USD (crypto only)</label><input id="don-usd" type="number" placeholder="0.00"/></div>
+      <div class="fg"><label>AMOUNT ROBUX (robux only)</label><input id="don-rbx" type="number" placeholder="0"/></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>CRYPTO TYPE</label><input id="don-crypto" placeholder="e.g. BTC, SOL"/></div>
+      <div class="fg"><label>TX HASH (optional)</label><input id="don-tx" placeholder="Transaction hash"/></div>
+    </div>
+    <div class="fg"><label>NOTE (optional)</label><input id="don-note" placeholder="Any notes..."/></div>
+    <div class="fg"><label>USER ID (optional — for badge)</label><input id="don-uid" placeholder="Discord user ID"/></div>
+    <div class="form-row"><button class="btn btn-blue" onclick="logDonation()">Log Donation</button></div>
+  </div>
+  <div class="tbl"><table><thead><tr><th>USER</th><th>TYPE</th><th>AMOUNT</th><th>DATE</th><th>ACTIONS</th></tr></thead><tbody id="don-tbl"></tbody></table></div>
+</div>
         <div class="adm-panel" id="ap-botcontrols">
   <div class="adm-title">Bot Controls</div>
   <div class="form-box">
@@ -550,6 +585,59 @@ h1 .hi{color:var(--accent);}
       <!-- CLAIMS -->
       <div class="sec-head"><div><div class="sec-title">Claim History</div></div></div>
       <div id="prof-claims" style="background:var(--s1);border:1px solid var(--b1);border-radius:12px;overflow:hidden;margin-bottom:32px;"></div>
+    </div>
+  </div>
+</div>
+
+<div class="pg" id="pg-donate">
+  <div class="hero">
+    <div class="eyebrow"><span class="dot"></span>DONATIONS</div>
+    <h1>Support<br/><span class="hi">SNT.</span></h1>
+    <p class="hero-sub">Every donation keeps the community running. Send crypto or Robux and get a special donator badge.</p>
+  </div>
+  <div class="wrap">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
+      <!-- CRYPTO -->
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Crypto Donations</div><div class="sec-sub">Send to any of these addresses</div></div></div>
+        <div id="donate-crypto-addresses" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+      <!-- ROBUX -->
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Robux Donations</div><div class="sec-sub">Send via Roblox group or trade</div></div></div>
+        <div class="form-box" style="text-align:center;">
+          <div style="font-size:32px;margin-bottom:10px;">🎮</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;">Send Robux</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Send Robux to our Roblox group store and DM Milly with proof.</div>
+          <a href="https://www.roblox.com/communities/105681830/Loner-Ent" target="_blank" class="btn btn-blue" style="text-decoration:none;display:inline-block;">Visit Group Store</a>
+        </div>
+      </div>
+    </div>
+    <!-- HOW IT WORKS -->
+    <div class="form-box" style="margin-bottom:32px;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">How it works</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">1️⃣</div><div><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any address above or send Robux to the group.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">2️⃣</div><div><div style="font-size:13px;font-weight:600;">DM Milly with proof</div><div style="font-size:12px;color:var(--text2);">Send your transaction hash or screenshot on Discord.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">3️⃣</div><div><div style="font-size:13px;font-weight:600;">Get your badge</div><div style="font-size:12px;color:var(--text2);">You'll receive the 💸 Donator badge on your profile.</div></div></div>
+      </div>
+    </div>
+    <!-- LEADERBOARDS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Top Crypto Donors</div><div class="sec-sub">All time</div></div></div>
+        <div class="lb">
+          <div class="lb-head" style="grid-template-columns:44px 1fr 100px 80px;"><span>RANK</span><span>USER</span><span>AMOUNT</span><span>CRYPTO</span></div>
+          <div id="donate-crypto-lb"></div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Top Robux Donors</div><div class="sec-sub">All time</div></div></div>
+        <div class="lb">
+          <div class="lb-head" style="grid-template-columns:44px 1fr 100px;"><span>RANK</span><span>USER</span><span>ROBUX</span></div>
+          <div id="donate-robux-lb"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -768,6 +856,7 @@ function go(id,btn,mob){
   if(id==='ev') rEV();
   if(id==='sh') rSH();
   if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();rAnnTbl();loadBotControls();}
+if(id==='donate'){loadDonations();}
   if(id==='casino'){cBal=parseInt(localStorage.getItem('snt_pts')||'0');document.getElementById('casino-bal').textContent=cBal.toLocaleString();}
 }
 
@@ -1528,6 +1617,7 @@ var BADGE_DEFS=[
   {key:'points_5000',label:'Big Bag',desc:'Reached 5,000 points',emoji:'💎'},
   {key:'points_10000',label:'Whale',desc:'Reached 10,000 points',emoji:'🐋'},
   {key:'og',label:'OG',desc:'One of the first 10 members',emoji:'🏆'},
+  {key:'donator',label:'Donator',desc:'Supported SNT with a donation',emoji:'💸'},
 ];
 
 var currentProfileId=null;
@@ -1747,6 +1837,137 @@ function timeAgo(date){
 
 loadActivity();
 activityTimer=setInterval(loadActivity,15000);
+
+// ─── DONATIONS ────────────────────────────────────────────────────────────────
+function loadDonations(){
+  fetch(API+'/donation-addresses').then(function(r){return r.json();}).then(function(addrs){
+    var html='';
+    var cryptoIcons={Bitcoin:'₿',Solana:'◎',Litecoin:'Ł',Ethereum:'Ξ',Monero:'ɱ'};
+    for(var i=0;i<addrs.length;i++){
+      var a=addrs[i];
+      var icon=cryptoIcons[a.crypto]||'💰';
+      html+='<div class="form-box" style="padding:16px 20px;">'+
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">'+
+        '<div style="font-size:20px;">'+icon+'</div>'+
+        '<div style="font-family:\'Syne\',sans-serif;font-size:14px;font-weight:700;">'+a.label+'</div>'+
+        '</div>'+
+        '<div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:12px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr(\''+a.address+'\')">'+a.address+'</div>'+
+        '<div style="font-size:11px;color:var(--text3);margin-top:6px;">Click address to copy</div>'+
+        '</div>';
+    }
+    document.getElementById('donate-crypto-addresses').innerHTML=html||'<div class="empty">No addresses added yet.</div>';
+  }).catch(function(){});
+
+  fetch(API+'/donations').then(function(r){return r.json();}).then(function(data){
+    var rkC=['rk1','rk2','rk3'];
+    // crypto lb
+    var ch='';
+    for(var i=0;i<data.crypto.length;i++){
+      var d=data.crypto[i];
+      var rCls=i<3?rkC[i]:'rkn';
+      var rNum=i<9?'0'+(i+1):''+(i+1);
+      ch+='<div class="lb-row" style="grid-template-columns:44px 1fr 100px 80px;">'+
+        '<span class="rk '+rCls+'">'+rNum+'</span>'+
+        '<span class="uname">'+d.username+'</span>'+
+        '<span class="pts-n">$'+parseFloat(d.amount_usd).toFixed(2)+'</span>'+
+        '<span style="font-size:12px;color:var(--text2);">'+d.crypto+'</span>'+
+        '</div>';
+    }
+    document.getElementById('donate-crypto-lb').innerHTML=ch||'<div class="empty">No donations yet.</div>';
+    // robux lb
+    var rh='';
+    for(var i=0;i<data.robux.length;i++){
+      var d=data.robux[i];
+      var rCls=i<3?rkC[i]:'rkn';
+      var rNum=i<9?'0'+(i+1):''+(i+1);
+      rh+='<div class="lb-row" style="grid-template-columns:44px 1fr 100px;">'+
+        '<span class="rk '+rCls+'">'+rNum+'</span>'+
+        '<span class="uname">'+d.username+'</span>'+
+        '<span class="pts-n">'+parseInt(d.amount_robux).toLocaleString()+' R$</span>'+
+        '</div>';
+    }
+    document.getElementById('donate-robux-lb').innerHTML=rh||'<div class="empty">No donations yet.</div>';
+  }).catch(function(){});
+}
+
+function copyAddr(addr){
+  navigator.clipboard.writeText(addr).then(function(){toast('Address copied!');}).catch(function(){toast('Failed to copy!','err');});
+}
+
+function addDonationAddress(){
+  var c=document.getElementById('da-crypto').value.trim();
+  var a=document.getElementById('da-address').value.trim();
+  var l=document.getElementById('da-label').value.trim()||c;
+  if(!c||!a){toast('Fill in crypto and address!','err');return;}
+  fetch(API+'/donation-addresses',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({crypto:c,address:a,label:l})})
+  .then(function(){
+    document.getElementById('da-crypto').value='';
+    document.getElementById('da-address').value='';
+    document.getElementById('da-label').value='';
+    rDonTbl();
+    loadDonations();
+    toast('Address added!');
+  }).catch(function(){toast('Failed!','err');});
+}
+
+function logDonation(){
+  var type=document.getElementById('don-type').value;
+  var user=document.getElementById('don-user').value.trim();
+  var usd=parseFloat(document.getElementById('don-usd').value)||0;
+  var rbx=parseInt(document.getElementById('don-rbx').value)||0;
+  var crypto=document.getElementById('don-crypto').value.trim();
+  var tx=document.getElementById('don-tx').value.trim();
+  var note=document.getElementById('don-note').value.trim();
+  var uid=document.getElementById('don-uid').value.trim();
+  if(!user){toast('Enter a username!','err');return;}
+  fetch(API+'/donations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:uid||null,username:user,amount_usd:usd,amount_robux:rbx,crypto:crypto,tx_hash:tx,note:note,donation_type:type})})
+  .then(function(){
+    ['don-user','don-usd','don-rbx','don-crypto','don-tx','don-note','don-uid'].forEach(function(id){document.getElementById(id).value='';});
+    rDonTbl();
+    toast('Donation logged!');
+  }).catch(function(){toast('Failed!','err');});
+}
+
+function rDonTbl(){
+  fetch(API+'/donations').then(function(r){return r.json();}).then(function(data){
+    var all=data.crypto.concat(data.robux).sort(function(a,b){return new Date(b.created_at)-new Date(a.created_at);});
+    var html='';
+    for(var i=0;i<all.length;i++){
+      var d=all[i];
+      var date=new Date(d.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+      var amt=d.donation_type==='robux'?parseInt(d.amount_robux).toLocaleString()+' R$':'$'+parseFloat(d.amount_usd).toFixed(2)+' '+d.crypto;
+      html+='<tr><td><b>'+d.username+'</b></td><td style="font-size:11px;font-weight:700;color:var(--accent-l);">'+d.donation_type.toUpperCase()+'</td><td>'+amt+'</td><td style="color:var(--text2);">'+date+'</td><td><button class="btn btn-sm btn-red" onclick="delDonation('+d.id+')">Remove</button></td></tr>';
+    }
+    document.getElementById('don-tbl').innerHTML=html||'<tr><td colspan="5" class="empty">No donations yet.</td></tr>';
+
+    // also render address list
+    fetch(API+'/donation-addresses').then(function(r){return r.json();}).then(function(addrs){
+      var html='';
+      for(var i=0;i<addrs.length;i++){
+        var a=addrs[i];
+        html+='<div style="display:flex;align-items:center;justify-content:space-between;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 14px;">'+
+          '<div><div style="font-size:13px;font-weight:600;">'+a.label+'</div><div style="font-size:11px;color:var(--text2);font-family:monospace;">'+a.address+'</div></div>'+
+          '<button class="btn btn-sm btn-red" onclick="delDonationAddr('+a.id+')">Remove</button>'+
+          '</div>';
+      }
+      document.getElementById('da-list').innerHTML=html||'';
+    }).catch(function(){});
+  }).catch(function(){});
+}
+
+function delDonation(id){
+  if(!confirm('Remove this donation?')) return;
+  fetch(API+'/donations/'+id,{method:'DELETE'})
+  .then(function(){rDonTbl();toast('Removed.');})
+  .catch(function(){toast('Failed!','err');});
+}
+
+function delDonationAddr(id){
+  if(!confirm('Remove this address?')) return;
+  fetch(API+'/donation-addresses/'+id,{method:'DELETE'})
+  .then(function(){rDonTbl();loadDonations();toast('Removed.');})
+  .catch(function(){toast('Failed!','err');});
+}
 
 buildThemeUI();
 
