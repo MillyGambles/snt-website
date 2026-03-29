@@ -409,7 +409,16 @@ h1 .hi{color:var(--accent);}
       <div class="fg"><label>AMOUNT ROBUX (robux only)</label><input id="don-rbx" type="number" placeholder="0"/></div>
     </div>
     <div class="fg2">
-      <div class="fg"><label>CRYPTO TYPE</label><input id="don-crypto" placeholder="e.g. BTC, SOL"/></div>
+      <div class="fg"><label>CRYPTO TYPE</label>
+        <select id="don-crypto">
+          <option value="">Select crypto...</option>
+          <option value="SOL">Solana (SOL)</option>
+          <option value="BTC">Bitcoin (BTC)</option>
+          <option value="ETH">Ethereum (ETH)</option>
+          <option value="LTC">Litecoin (LTC)</option>
+          <option value="ADA">Cardano (ADA)</option>
+        </select>
+      </div>
       <div class="fg"><label>TX HASH (optional)</label><input id="don-tx" placeholder="Transaction hash"/></div>
     </div>
     <div class="fg"><label>NOTE (optional)</label><input id="don-note" placeholder="Any notes..."/></div>
@@ -1886,12 +1895,14 @@ function loadDonations(){
       var d=data.crypto[i];
       var rCls=i<3?rkC[i]:'rkn';
       var rNum=i<9?'0'+(i+1):''+(i+1);
-      ch+='<div class="lb-row" style="grid-template-columns:44px 1fr 100px 80px;">'+
-        '<span class="rk '+rCls+'">'+rNum+'</span>'+
-        '<span class="uname">'+d.username+'</span>'+
-        '<span class="pts-n">$'+parseFloat(d.amount_usd).toFixed(2)+'</span>'+
-        '<span style="font-size:12px;color:var(--text2);">'+d.crypto+'</span>'+
-        '</div>';
+      var cryptoLogos={SOL:'https://cryptologos.cc/logos/solana-sol-logo.png',BTC:'https://cryptologos.cc/logos/bitcoin-btc-logo.png',ETH:'https://cryptologos.cc/logos/ethereum-eth-logo.png',LTC:'https://cryptologos.cc/logos/litecoin-ltc-logo.png',ADA:'https://cryptologos.cc/logos/cardano-ada-logo.png'};
+var cLogo=cryptoLogos[d.crypto]?'<img src="'+cryptoLogos[d.crypto]+'" style="width:16px;height:16px;border-radius:50%;vertical-align:middle;margin-right:3px;"/>':'';
+ch+='<div class="lb-row" style="grid-template-columns:44px 1fr 100px 80px;">'+
+  '<span class="rk '+rCls+'">'+rNum+'</span>'+
+  '<span class="uname">'+d.username+'</span>'+
+  '<span class="pts-n">$'+parseFloat(d.amount_usd).toFixed(2)+'</span>'+
+  '<span style="font-size:12px;color:var(--text2);">'+cLogo+d.crypto+'</span>'+
+  '</div>';
     }
     document.getElementById('donate-crypto-lb').innerHTML=ch||'<div class="empty">No donations yet.</div>';
     // robux lb
