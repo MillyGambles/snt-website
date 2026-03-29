@@ -340,6 +340,7 @@ h1 .hi{color:var(--accent);}
         <button class="adm-btn" onclick="adm('claims',this)">Claims</button>
         <button class="adm-btn" onclick="adm('announcements',this)">Announcements</button>
         <button class="adm-btn" onclick="adm('theme',this)">Theme</button>
+        <button class="adm-btn" onclick="adm('botcontrols',this)">Bot Controls</button>
       </div>
       <div>
         <div class="adm-panel on" id="ap-shop">
@@ -382,6 +383,46 @@ h1 .hi{color:var(--accent);}
           <div class="adm-title">Reward Claims</div>
           <div class="tbl"><table><thead><tr><th>USER</th><th>ITEM</th><th>DATE</th><th>STATUS</th><th>ACTIONS</th></tr></thead><tbody id="cl-tbl"></tbody></table></div>
         </div>
+        <div class="adm-panel" id="ap-botcontrols">
+  <div class="adm-title">Bot Controls</div>
+  <div class="form-box">
+    <div class="adm-title" style="font-size:14px;margin-bottom:12px;">Toggles</div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div style="font-size:13px;font-weight:600;">AI Responses</div><div style="font-size:12px;color:var(--text2);">Bot replies when mentioned</div></div>
+        <label class="tog"><input type="checkbox" id="bot-ai-tog" onchange="saveBotSetting('bot_ai_enabled',this.checked)"/><span class="tog-s"></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div style="font-size:13px;font-weight:600;">Welcome Messages</div><div style="font-size:12px;color:var(--text2);">Sends welcome when someone joins</div></div>
+        <label class="tog"><input type="checkbox" id="bot-welcome-tog" onchange="saveBotSetting('bot_welcome_enabled',this.checked)"/><span class="tog-s"></span></label>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><div style="font-size:13px;font-weight:600;">Milestone Notifications</div><div style="font-size:12px;color:var(--text2);">Announces invite milestones</div></div>
+        <label class="tog"><input type="checkbox" id="bot-milestone-tog" onchange="saveBotSetting('bot_milestones_enabled',this.checked)"/><span class="tog-s"></span></label>
+      </div>
+    </div>
+  </div>
+  <div class="form-box">
+    <div class="adm-title" style="font-size:14px;margin-bottom:12px;">AI Prompt</div>
+    <div class="fg">
+      <label>SYSTEM PROMPT</label>
+      <textarea id="bot-prompt" rows="4" placeholder="You are a helpful Discord bot..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-blue btn-sm" onclick="saveBotPrompt()">Save Prompt</button>
+      <button class="btn btn-ghost btn-sm" onclick="resetBotPrompt()">Reset to Default</button>
+    </div>
+  </div>
+  <div class="form-box">
+    <div class="adm-title" style="font-size:14px;margin-bottom:12px;">Allowed Channels for AI</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px;">Leave empty to allow all channels. Add channel IDs to restrict.</div>
+    <div id="bot-channels-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+    <div style="display:flex;gap:8px;">
+      <input id="bot-channel-input" placeholder="Channel ID e.g. 1234567890" style="flex:1;background:var(--s2);border:1px solid var(--b1);border-radius:7px;color:var(--text);font-size:13px;padding:8px 11px;outline:none;"/>
+      <button class="btn btn-blue btn-sm" onclick="addBotChannel()">Add</button>
+    </div>
+  </div>
+</div>
         <div class="adm-panel" id="ap-announcements">
   <div class="adm-title">Announcements</div>
   <div class="form-box">
@@ -726,7 +767,7 @@ function go(id,btn,mob){
   if(id==='lb') rLB();
   if(id==='ev') rEV();
   if(id==='sh') rSH();
-  if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();rAnnTbl();}
+  if(id==='adm'){rShTbl();rEvTbl();rUsTbl();rClTbl();rAnnTbl();loadBotControls();}
   if(id==='casino'){cBal=parseInt(localStorage.getItem('snt_pts')||'0');document.getElementById('casino-bal').textContent=cBal.toLocaleString();}
 }
 
@@ -1345,6 +1386,67 @@ fetch(API+'/settings/anim').then(function(r){return r.json();}).then(function(da
     toggleAnim(true);
   }
 }).catch(function(){});
+
+// ─── BOT CONTROLS ─────────────────────────────────────────────────────────────
+var botChannels=[];
+
+function loadBotControls(){
+  fetch(API+'/bot/settings').then(function(r){return r.json();}).then(function(data){
+    if(data.bot_ai_enabled!==null) document.getElementById('bot-ai-tog').checked=data.bot_ai_enabled;
+    if(data.bot_welcome_enabled!==null) document.getElementById('bot-welcome-tog').checked=data.bot_welcome_enabled;
+    if(data.bot_milestones_enabled!==null) document.getElementById('bot-milestone-tog').checked=data.bot_milestones_enabled;
+    if(data.bot_prompt) document.getElementById('bot-prompt').value=data.bot_prompt;
+    if(data.bot_allowed_channels) botChannels=data.bot_allowed_channels;
+    renderBotChannels();
+  }).catch(function(){toast('Failed to load bot settings!','err');});
+}
+
+function saveBotSetting(key,val){
+  var body={};body[key]=val;
+  fetch(API+'/bot/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(function(){toast('Saved!');})
+  .catch(function(){toast('Failed!','err');});
+}
+
+function saveBotPrompt(){
+  var p=document.getElementById('bot-prompt').value.trim();
+  if(!p){toast('Enter a prompt!','err');return;}
+  saveBotSetting('bot_prompt',p);
+}
+
+function resetBotPrompt(){
+  var def='You are a helpful friendly Discord bot made by Milly. Casual lowercase grammar, argues back if needed, short responses.';
+  document.getElementById('bot-prompt').value=def;
+  saveBotSetting('bot_prompt',def);
+  toast('Prompt reset!');
+}
+
+function renderBotChannels(){
+  var html='';
+  for(var i=0;i<botChannels.length;i++){
+    var ch=botChannels[i];
+    html+='<span style="background:var(--s2);border:1px solid var(--b1);border-radius:99px;padding:3px 10px;font-size:12px;cursor:pointer;" onclick="removeBotChannel(\''+ch+'\')" title="Click to remove">'+ch+' ×</span>';
+  }
+  document.getElementById('bot-channels-list').innerHTML=html||'<span style="font-size:12px;color:var(--text3);">All channels allowed</span>';
+}
+
+function addBotChannel(){
+  var id=document.getElementById('bot-channel-input').value.trim();
+  if(!id){toast('Enter a channel ID!','err');return;}
+  if(botChannels.indexOf(id)>-1){toast('Already added!','err');return;}
+  botChannels.push(id);
+  document.getElementById('bot-channel-input').value='';
+  renderBotChannels();
+  saveBotSetting('bot_allowed_channels',botChannels);
+}
+
+function removeBotChannel(id){
+  botChannels=botChannels.filter(function(c){return c!==id;});
+  renderBotChannels();
+  saveBotSetting('bot_allowed_channels',botChannels);
+  toast('Channel removed!');
+}
+
 function buildThemeUI(){
   var pg=document.getElementById('preset-grid');
   var html='';
