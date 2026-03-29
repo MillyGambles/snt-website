@@ -957,7 +957,9 @@ function addItem(){
 function togItem(id,v){
   var it=D.items.find(function(i){return i.id===id;});
   if(it) it.active=v;
-  toast('Item '+(v?'enabled':'disabled')+'.');
+  fetch(API+'/shop/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({active:v})})
+  .then(function(){toast('Item '+(v?'enabled':'disabled')+'.');})
+  .catch(function(){toast('Failed!','err');});
 }
 
 function delItem(id){
