@@ -596,34 +596,8 @@ h1 .hi{color:var(--accent);}
     <p class="hero-sub">Every donation keeps the community running. Send crypto or Robux and get a special donator badge.</p>
   </div>
   <div class="wrap">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
-      <!-- CRYPTO -->
-      <div>
-        <div class="sec-head"><div><div class="sec-title">Crypto Donations</div><div class="sec-sub">Send to any of these addresses</div></div></div>
-        <div id="donate-crypto-addresses" style="display:flex;flex-direction:column;gap:10px;"></div>
-      </div>
-      <!-- ROBUX -->
-      <div>
-        <div class="sec-head"><div><div class="sec-title">Robux Donations</div><div class="sec-sub">Send via Roblox group or trade</div></div></div>
-        <div class="form-box" style="text-align:center;">
-          <div style="font-size:32px;margin-bottom:10px;">🎮</div>
-          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px;">Send Robux</div>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:14px;">Send Robux to our Roblox group store and DM Milly with proof.</div>
-          <a href="https://www.roblox.com/communities/105681830/Loner-Ent" target="_blank" class="btn btn-blue" style="text-decoration:none;display:inline-block;">Visit Group Store</a>
-        </div>
-      </div>
-    </div>
-    <!-- HOW IT WORKS -->
-    <div class="form-box" style="margin-bottom:32px;">
-      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:14px;">How it works</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
-        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">1️⃣</div><div><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any address above or send Robux to the group.</div></div></div>
-        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">2️⃣</div><div><div style="font-size:13px;font-weight:600;">DM Milly with proof</div><div style="font-size:12px;color:var(--text2);">Send your transaction hash or screenshot on Discord.</div></div></div>
-        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:24px;">3️⃣</div><div><div style="font-size:13px;font-weight:600;">Get your badge</div><div style="font-size:12px;color:var(--text2);">You'll receive the 💸 Donator badge on your profile.</div></div></div>
-      </div>
-    </div>
     <!-- LEADERBOARDS -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
       <div>
         <div class="sec-head"><div><div class="sec-title">Top Crypto Donors</div><div class="sec-sub">All time</div></div></div>
         <div class="lb">
@@ -636,6 +610,52 @@ h1 .hi{color:var(--accent);}
         <div class="lb">
           <div class="lb-head" style="grid-template-columns:44px 1fr 100px;"><span>RANK</span><span>USER</span><span>ROBUX</span></div>
           <div id="donate-robux-lb"></div>
+        </div>
+      </div>
+    </div>
+    <!-- HOW IT WORKS -->
+    <div class="form-box" style="margin-bottom:32px;text-align:center;">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:20px;">How it works</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">1️⃣</div><div><div style="font-size:13px;font-weight:600;">Send your donation</div><div style="font-size:12px;color:var(--text2);">Use any crypto address below or donate Robux via Pls Donate.</div></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">2️⃣</div><div><div style="font-size:13px;font-weight:600;">DM Milly with proof</div><div style="font-size:12px;color:var(--text2);">Send your transaction hash or screenshot on Discord.</div></div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><div style="font-size:32px;">3️⃣</div><div><div style="font-size:13px;font-weight:600;">Get your badge</div><div style="font-size:12px;color:var(--text2);">You'll receive the 💸 Donator badge on your profile.</div></div></div>
+      </div>
+    </div>
+    <!-- CRYPTO & ROBUX -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Crypto Donations</div><div class="sec-sub">Click any address to copy</div></div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="form-box" style="padding:16px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/solana-sol-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Solana</div></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('9Sihjh9Ee16zgfSBq42LD4zRfkMcAjNezfrXBs43byNi')">9Sihjh9Ee16zgfSBq42LD4zRfkMcAjNezfrXBs43byNi</div>
+          </div>
+          <div class="form-box" style="padding:16px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Bitcoin</div></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('bc1q6dryspfdwxd9yrs6k0a93z8yus70dumesnhv0m')">bc1q6dryspfdwxd9yrs6k0a93z8yus70dumesnhv0m</div>
+          </div>
+          <div class="form-box" style="padding:16px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/ethereum-eth-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Ethereum</div></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('0xBB6a3Ca8A628C38Bc7186bF232F58E859cd0D552')">0xBB6a3Ca8A628C38Bc7186bF232F58E859cd0D552</div>
+          </div>
+          <div class="form-box" style="padding:16px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/litecoin-ltc-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Litecoin</div></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('LQstWCLpd6iwpbrT2uj75eS3KTF12Xizmc')">LQstWCLpd6iwpbrT2uj75eS3KTF12Xizmc</div>
+          </div>
+          <div class="form-box" style="padding:16px 20px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;"><img src="https://cryptologos.cc/logos/cardano-ada-logo.png" style="width:24px;height:24px;border-radius:50%;"/><div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;">Cardano</div></div>
+            <div style="background:var(--s2);border:1px solid var(--b1);border-radius:7px;padding:10px 14px;font-family:monospace;font-size:11px;color:var(--accent-l);word-break:break-all;cursor:pointer;" onclick="copyAddr('addr1qx2vmh9f0lsn8hkrum88wfl682a227k8xn6llhd7awa2uy55ehw2jllpx00v8ekwwunl5w4654avwd84llwma6a64cfqd9ld35')">addr1qx2vmh9f0lsn8hkrum88wfl682a227k8xn6llhd7awa2uy55ehw2jllpx00v8ekwwunl5w4654avwd84llwma6a64cfqd9ld35</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="sec-head"><div><div class="sec-title">Robux Donations</div><div class="sec-sub">Via Pls Donate on Roblox</div></div></div>
+        <div class="form-box" style="text-align:center;padding:32px 20px;">
+          <div style="font-size:48px;margin-bottom:14px;">🎮</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px;">Donate Robux</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:20px;max-width:260px;margin-left:auto;margin-right:auto;">Find Milly on Pls Donate and send any amount of Robux. DM proof on Discord after!</div>
+          <a href="https://www.roblox.com/users/8738313102/profile" target="_blank" class="btn btn-blue" style="text-decoration:none;display:inline-block;">Find on Roblox</a>
         </div>
       </div>
     </div>
