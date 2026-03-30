@@ -997,9 +997,33 @@ function rEV(){
       '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+dateStr+'</div>'+
       countdown+
       (pz?'<div class="prizes" style="padding-top:10px;border-top:1px solid var(--b1);">'+pz+'</div>':'')+
+      '<div id="ev-podium-'+e.id+'" style="margin-top:10px;"></div>'+
       '</div>';
   }
   document.getElementById('ev-rows').innerHTML=html||'<div class="empty">No events yet.</div>';
+  // load podiums
+for(var i=0;i<D.events.length;i++){
+  (function(ev){
+    fetch(API+'/events/'+ev.id+'/leaderboard').then(function(r){return r.json();}).then(function(top){
+      var pod=document.getElementById('ev-podium-'+ev.id);
+      if(!pod||!top.length) return;
+      var medals=['🥇','🥈','🥉'];
+      var podHtml='<div style="border-top:1px solid var(--b1);padding-top:10px;margin-top:4px;"><div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--text3);margin-bottom:8px;">TOP INVITERS</div><div style="display:flex;flex-direction:column;gap:6px;">';
+      for(var j=0;j<top.length;j++){
+        var u=top[j];
+        var av=u.avatar&&u.id?'<img src="https://cdn.discordapp.com/avatars/'+u.id+'/'+u.avatar+'.png?size=32" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'"/>':'';
+        podHtml+='<div style="display:flex;align-items:center;gap:8px;">'+
+          '<span style="font-size:14px;">'+medals[j]+'</span>'+
+          av+
+          '<span style="font-size:12px;font-weight:600;">'+u.username+'</span>'+
+          '<span style="margin-left:auto;font-size:11px;color:var(--accent-l);font-weight:600;">'+u.invites+' invites</span>'+
+          '</div>';
+      }
+      podHtml+='</div></div>';
+      pod.innerHTML=podHtml;
+    }).catch(function(){});
+  })(D.events[i]);
+}
 }
 
 function rSH(){
