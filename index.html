@@ -358,8 +358,19 @@ h1 .hi{color:var(--accent);}
               <div class="fg"><label>EMOJI</label><input id="a-icon" placeholder="💎"/></div>
             </div>
             <div class="fg2">
-              <div class="fg"><label>ITEM TYPE</label><select id="a-type"><option value="reward">Regular Reward</option><option value="role">Discord Role</option><option value="gift">Giftable Item</option></select></div>
-              <div class="fg"><label>DISCORD ROLE ID (if role type)</label><input id="a-role-id" placeholder="e.g. 1234567890"/></div>
+              <div class="fg"><label>ITEM TYPE</label><select id="a-type" onchange="toggleRoleFields(this.value)"><option value="reward">Regular Reward</option><option value="role">Discord Role</option><option value="gift">Giftable Item</option></select></div>
+            </div>
+            <div id="role-fields" style="display:none;">
+              <div class="fg2">
+                <div class="fg"><label>DISCORD ROLE ID</label><input id="a-role-id" placeholder="e.g. 1234567890" oninput="previewRole()"/></div>
+                <div class="fg"><label>ROLE COLOR</label><input type="color" id="a-role-color" value="#3b82f6" oninput="previewRole()"/></div>
+              </div>
+              <div id="role-preview" style="display:none;margin-bottom:12px;">
+                <label style="font-size:11px;font-weight:600;color:var(--text2);letter-spacing:0.5px;">PREVIEW</label>
+                <div style="margin-top:6px;display:flex;align-items:center;gap:10px;">
+                  <div id="role-chip-preview" style="font-size:12px;font-weight:700;padding:4px 12px;border-radius:99px;display:inline-block;"></div>
+                </div>
+              </div>
             </div>
             <div class="form-row"><button class="btn btn-blue" onclick="addItem()">Add Item</button></div>
           </div>
@@ -1169,9 +1180,12 @@ function addItem(){
   var s=parseInt(document.getElementById('a-stock').value);
   var ic=document.getElementById('a-icon').value.trim()||'';
   var type=document.getElementById('a-type').value;
-  var roleId=document.getElementById('a-role-id').value.trim()||null;
+  var roleId=document.getElementById('a-role-id')?document.getElementById('a-role-id').value.trim()||null:null;
+  var roleColor=document.getElementById('a-role-color')?document.getElementById('a-role-color').value:'#3b82f6';
+  if(type==='role') ic=roleColor; // store color in icon field for roles
   if(!n||isNaN(c)){toast('Fill in name and cost!','err');return;}
-  fetch(API+'/shop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,description:d,cost:c,stock:isNaN(s)?-1:s,icon:ic,item_type:type,discord_role_id:roleId})})
+  fetch(API+'/shop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,description:d,cost:c,stock:isNaN(s)?-1:s,icon:ic,item_type:type,discord_role_id:roleId,role_color:roleColor})
+})
   .then(function(){
     D.items.push({id:Date.now(),name:n,cost:c,desc:d,stock:isNaN(s)?-1:s,icon:ic,active:true,item_type:type,discord_role_id:roleId});
     ['a-name','a-cost','a-desc','a-stock','a-icon','a-role-id'].forEach(function(x){document.getElementById(x).value='';});
@@ -1331,7 +1345,7 @@ fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data
   });
 }).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
-fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true,item_type:i.item_type||'reward',discord_role_id:i.discord_role_id||null};});}).catch(function(){});
+fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true,item_type:i.item_type||'reward',discord_role_id:i.discord_role_id||null,role_color:i.role_color||'#3b82f6'};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
   D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]'),start_date:e.start_date,end_date:e.end_date};});
   rEV();
@@ -2074,7 +2088,21 @@ function delDonationAddr(id){
   .catch(function(){toast('Failed!','err');});
 }
 
+function toggleRoleFields(type){
+  document.getElementById('role-fields').style.display=type==='role'?'block':'none';
+  if(type==='role') previewRole();
+}
 
+function previewRole(){
+  var name=document.getElementById('a-name').value.trim()||'Role Name';
+  var color=document.getElementById('a-role-color').value;
+  var chip=document.getElementById('role-chip-preview');
+  chip.textContent=name;
+  chip.style.background=color+'22';
+  chip.style.color=color;
+  chip.style.border='1px solid '+color+'55';
+  document.getElementById('role-preview').style.display='block';
+}
 
 buildThemeUI();
 
