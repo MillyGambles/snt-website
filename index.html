@@ -1032,17 +1032,17 @@ for(var i=0;i<D.events.length;i++){
 
 function rSH(){
   document.getElementById('u-pts').textContent=D.myPts.toLocaleString()+' pts';
-  var active=D.items.filter(function(i){return i.active;});
-  var html='';
-  for(var i=0;i<active.length;i++){
-    var it=active[i];
+  var rewards=D.items.filter(function(i){return i.active&&i.item_type!=='role';});
+  var roles=D.items.filter(function(i){return i.active&&i.item_type==='role';});
+
+  function makeCard(it){
     var pct=Math.min(100,Math.round(D.myPts/it.cost*100));
     var can=D.myPts>=it.cost;
     var oos=it.stock===0;
     var stk=it.stock===-1?'Unlimited stock':it.stock===0?'Out of stock':it.stock+' left';
     var btnTxt=oos?'Out of stock':can?'Claim reward':(it.cost-D.myPts).toLocaleString()+' pts away';
     var btnCls=can&&!oos?'btn-green':'btn-ghost';
-    html+='<div class="sh-card">'+
+    return '<div class="sh-card">'+
       (oos?'<span class="oos-tag">Out of stock</span>':'')+
       '<div class="sh-icon">'+it.icon+'</div>'+
       '<div class="sh-cost">'+it.cost.toLocaleString()+' POINTS</div>'+
@@ -1052,13 +1052,49 @@ function rSH(){
       '<div class="prog-bg"><div class="prog-bar" style="width:'+pct+'%"></div></div>'+
       '<div class="prog-row"><span>'+D.myPts.toLocaleString()+' / '+it.cost.toLocaleString()+' pts</span><span>'+pct+'%</span></div>'+
       '<div style="display:flex;gap:6px;">'+
-'<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')">'+btnTxt+'</button>'+
-(it.item_type==='gift'&&can&&!oos?'<button class="btn btn-sm btn-ghost" onclick="giftItem('+it.id+')">🎁 Gift</button>':'')+
-'</div>'+
-(it.item_type==='role'?'<div style="font-size:10px;color:var(--accent-l);font-weight:600;margin-top:2px;">🎭 Discord Role</div>':'')+
+      '<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')">'+btnTxt+'</button>'+
+      (it.item_type==='gift'&&can&&!oos?'<button class="btn btn-sm btn-ghost" onclick="giftItem('+it.id+')">🎁 Gift</button>':'')+
+      '</div>'+
       '</div>';
   }
-  document.getElementById('sh-rows').innerHTML=html||'<div class="empty">No items in shop yet.</div>';
+
+  var html='';
+  if(rewards.length){
+    html+='<div class="sec-head" style="margin-top:0;"><div><div class="sec-title">Rewards</div><div class="sec-sub">Redeem your points for real prizes</div></div></div>';
+    html+='<div class="shop-grid" style="margin-bottom:32px;">';
+    for(var i=0;i<rewards.length;i++) html+=makeCard(rewards[i]);
+    html+='</div>';
+  }
+
+  if(roles.length){
+    html+='<div class="sec-head"><div><div class="sec-title">Discord Roles</div><div class="sec-sub">Buy a role and it gets assigned to you automatically</div></div></div>';
+    html+='<div class="shop-grid">';
+    for(var i=0;i<roles.length;i++){
+      var it=roles[i];
+      var pct=Math.min(100,Math.round(D.myPts/it.cost*100));
+      var can=D.myPts>=it.cost;
+      var oos=it.stock===0;
+      var stk=it.stock===-1?'Unlimited stock':it.stock===0?'Out of stock':it.stock+' left';
+      var btnTxt=oos?'Out of stock':can?'Get Role':(it.cost-D.myPts).toLocaleString()+' pts away';
+      var btnCls=can&&!oos?'btn-green':'btn-ghost';
+      html+='<div class="sh-card" style="border-color:'+(can?'var(--accent-border)':'var(--b1)')+';">'+
+        (oos?'<span class="oos-tag">Out of stock</span>':'')+
+        '<div class="sh-icon">'+it.icon+'</div>'+
+        '<div style="font-size:10px;font-weight:700;color:var(--accent-l);letter-spacing:1px;">🎭 DISCORD ROLE</div>'+
+        '<div class="sh-cost">'+it.cost.toLocaleString()+' POINTS</div>'+
+        '<div class="sh-name">'+it.name+'</div>'+
+        '<div class="sh-desc">'+it.desc+'</div>'+
+        '<div class="sh-stock">'+stk+'</div>'+
+        '<div class="prog-bg"><div class="prog-bar" style="width:'+pct+'%"></div></div>'+
+        '<div class="prog-row"><span>'+D.myPts.toLocaleString()+' / '+it.cost.toLocaleString()+' pts</span><span>'+pct+'%</span></div>'+
+        '<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')">'+btnTxt+'</button>'+
+        '</div>';
+    }
+    html+='</div>';
+  }
+
+  if(!rewards.length&&!roles.length) html='<div class="empty">No items in shop yet.</div>';
+  document.getElementById('sh-rows').innerHTML=html;
 }
 
 function claim(id){
