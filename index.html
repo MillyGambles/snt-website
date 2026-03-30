@@ -1087,16 +1087,19 @@ function rSH(){
       var btnTxt=oos?'Out of stock':can?'Get Role':(it.cost-D.myPts).toLocaleString()+' pts away';
       var btnCls=can&&!oos?'btn-green':'btn-ghost';
       var rc=it.role_color||'#3b82f6';
-      html+='<div class="sh-card" style="position:relative;border-color:'+rc+'44;">'+
-        '<div style="position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;background:'+rc+'22;color:'+rc+';border:1px solid '+rc+'44;padding:2px 7px;border-radius:99px;letter-spacing:0.5px;">DISCORD ROLE</div>'+
-        '<div style="margin-bottom:8px;margin-top:4px;"><span style="font-size:13px;font-weight:700;padding:4px 14px;border-radius:99px;background:'+rc+'22;color:'+rc+';border:1px solid '+rc+'44;">@'+it.name+'</span></div>'+
-        '<div class="sh-cost">'+it.cost.toLocaleString()+' POINTS</div>'+
-        '<div class="sh-desc">'+it.desc+'</div>'+
-        '<div class="sh-stock">'+stk+'</div>'+
-        '<div class="prog-bg"><div class="prog-bar" style="width:'+pct+'%;background:'+rc+'"></div></div>'+
-        '<div class="prog-row"><span>'+D.myPts.toLocaleString()+' / '+it.cost.toLocaleString()+' pts</span><span>'+pct+'%</span></div>'+
-        '<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')" style="'+(can&&!oos?'background:'+rc+'22;color:'+rc+';border:1px solid '+rc+'44;':'')+'">'+btnTxt+'</button>'+
-        '</div>';
+      html+='<div class="sh-card" style="position:relative;border-color:'+rc+'44;min-height:140px;">'+
+  '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">'+
+    '<div class="sh-cost">'+it.cost.toLocaleString()+' POINTS</div>'+
+    '<div style="font-size:9px;font-weight:700;background:'+rc+'22;color:'+rc+';border:1px solid '+rc+'44;padding:2px 7px;border-radius:99px;letter-spacing:0.5px;">DISCORD ROLE</div>'+
+  '</div>'+
+  '<div style="display:flex;align-items:center;justify-content:center;flex:1;padding:10px 0 16px;">'+
+    '<span style="font-size:clamp(11px,3vw,18px);font-weight:800;padding:6px 18px;border-radius:99px;background:'+rc+'22;color:'+rc+';border:2px solid '+rc+'66;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;display:block;text-align:center;">@'+it.name+'</span>'+
+  '</div>'+
+  '<div class="sh-stock" style="margin-bottom:6px;">'+stk+'</div>'+
+  '<div class="prog-bg"><div class="prog-bar" style="width:'+pct+'%;background:'+rc+'"></div></div>'+
+  '<div class="prog-row"><span>'+D.myPts.toLocaleString()+' / '+it.cost.toLocaleString()+' pts</span><span>'+pct+'%</span></div>'+
+  '<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')" style="margin-top:8px;'+(can&&!oos?'background:'+rc+'22;color:'+rc+';border:1px solid '+rc+'44;':'')+'">'+btnTxt+'</button>'+
+  '</div>';
     }
     html+='</div>';
   }
