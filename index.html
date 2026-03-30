@@ -1377,7 +1377,7 @@ fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data
   });
 }).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
-fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true,item_type:i.item_type||'reward',discord_role_id:i.discord_role_id||null,role_color:i.role_color||'#3b82f6'};});}).catch(function(){});
+fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true,item_type:i.item_type||'reward',discord_role_id:i.discord_role_id||null,role_color:i.role_color||'#3b82f6'};});rSH();}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
   D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]'),start_date:e.start_date,end_date:e.end_date};});
   rEV();
