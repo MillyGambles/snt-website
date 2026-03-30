@@ -357,6 +357,10 @@ h1 .hi{color:var(--accent);}
               <div class="fg"><label>STOCK (-1 = unlimited)</label><input id="a-stock" type="number" placeholder="-1"/></div>
               <div class="fg"><label>EMOJI</label><input id="a-icon" placeholder="💎"/></div>
             </div>
+            <div class="fg2">
+              <div class="fg"><label>ITEM TYPE</label><select id="a-type"><option value="reward">Regular Reward</option><option value="role">Discord Role</option><option value="gift">Giftable Item</option></select></div>
+              <div class="fg"><label>DISCORD ROLE ID (if role type)</label><input id="a-role-id" placeholder="e.g. 1234567890"/></div>
+            </div>
             <div class="form-row"><button class="btn btn-blue" onclick="addItem()">Add Item</button></div>
           </div>
           <div class="tbl"><table><thead><tr><th>ITEM</th><th>COST</th><th>STOCK</th><th>ACTIVE</th><th>ACTIONS</th></tr></thead><tbody id="sh-tbl"></tbody></table></div>
@@ -1047,7 +1051,11 @@ function rSH(){
       '<div class="sh-stock">'+stk+'</div>'+
       '<div class="prog-bg"><div class="prog-bar" style="width:'+pct+'%"></div></div>'+
       '<div class="prog-row"><span>'+D.myPts.toLocaleString()+' / '+it.cost.toLocaleString()+' pts</span><span>'+pct+'%</span></div>'+
-      '<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')">'+btnTxt+'</button>'+
+      '<div style="display:flex;gap:6px;">'+
+'<button class="btn btn-sm '+btnCls+'" '+((!can||oos)?'disabled':'')+' onclick="claim('+it.id+')">'+btnTxt+'</button>'+
+(it.item_type==='gift'&&can&&!oos?'<button class="btn btn-sm btn-ghost" onclick="giftItem('+it.id+')">🎁 Gift</button>':'')+
+'</div>'+
+(it.item_type==='role'?'<div style="font-size:10px;color:var(--accent-l);font-weight:600;margin-top:2px;">🎭 Discord Role</div>':'')+
       '</div>';
   }
   document.getElementById('sh-rows').innerHTML=html||'<div class="empty">No items in shop yet.</div>';
@@ -1160,11 +1168,13 @@ function addItem(){
   var d=document.getElementById('a-desc').value.trim();
   var s=parseInt(document.getElementById('a-stock').value);
   var ic=document.getElementById('a-icon').value.trim()||'';
+  var type=document.getElementById('a-type').value;
+  var roleId=document.getElementById('a-role-id').value.trim()||null;
   if(!n||isNaN(c)){toast('Fill in name and cost!','err');return;}
-  fetch(API+'/shop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,description:d,cost:c,stock:isNaN(s)?-1:s,icon:ic})})
+  fetch(API+'/shop',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,description:d,cost:c,stock:isNaN(s)?-1:s,icon:ic,item_type:type,discord_role_id:roleId})})
   .then(function(){
-    D.items.push({id:Date.now(),name:n,cost:c,desc:d,stock:isNaN(s)?-1:s,icon:ic,active:true});
-    ['a-name','a-cost','a-desc','a-stock','a-icon'].forEach(function(x){document.getElementById(x).value='';});
+    D.items.push({id:Date.now(),name:n,cost:c,desc:d,stock:isNaN(s)?-1:s,icon:ic,active:true,item_type:type,discord_role_id:roleId});
+    ['a-name','a-cost','a-desc','a-stock','a-icon','a-role-id'].forEach(function(x){document.getElementById(x).value='';});
     rShTbl();
     toast(n+' added to shop!');
   }).catch(function(){toast('Failed to save!','err');});
@@ -1321,7 +1331,7 @@ fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data
   });
 }).catch(function(){rLB();});
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
-fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
+fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true,item_type:i.item_type||'reward',discord_role_id:i.discord_role_id||null};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
   D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]'),start_date:e.start_date,end_date:e.end_date};});
   rEV();
@@ -2062,6 +2072,33 @@ function delDonationAddr(id){
   fetch(API+'/donation-addresses/'+id,{method:'DELETE'})
   .then(function(){rDonTbl();loadDonations();toast('Removed.');})
   .catch(function(){toast('Failed!','err');});
+}
+
+function giftItem(id){
+  var it=D.items.find(function(i){return i.id===id;});
+  if(!it){toast('Item not found!','err');return;}
+  if(!D.myId){toast('Login with Discord first!','err');return;}
+  var users=D.users.filter(function(u){return u.id!==D.myId;});
+  if(!users.length){toast('No other members to gift to!','err');return;}
+  var opts=users.map(function(u){return u.name;}).join('\n');
+  var name=prompt('Gift to who? Enter their exact username:\n\n'+opts);
+  if(!name) return;
+  var target=D.users.find(function(u){return u.name.toLowerCase()===name.toLowerCase();});
+  if(!target){toast('User not found!','err');return;}
+  if(D.myPts<it.cost){toast('Not enough points!','err');return;}
+  if(!confirm('Gift '+it.name+' to '+target.name+' for '+it.cost+' pts?')) return;
+  var newPts=D.myPts-it.cost;
+  fetch(API+'/users/'+D.myId,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({points:newPts})})
+  .then(function(){
+    return fetch(API+'/claims',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:D.myId,item_id:id,gifted_to_id:target.id,gifted_to_name:target.name})});
+  })
+  .then(function(){
+    D.myPts=newPts;
+    localStorage.setItem('snt_pts',newPts);
+    document.getElementById('user-pts-nav').textContent=newPts.toLocaleString()+' pts';
+    toast('Gifted '+it.name+' to '+target.name+'! 🎁');
+    rSH();
+  }).catch(function(){toast('Failed to gift!','err');});
 }
 
 buildThemeUI();
