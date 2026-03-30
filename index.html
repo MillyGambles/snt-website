@@ -370,8 +370,12 @@ h1 .hi{color:var(--accent);}
             </div>
             <div class="fg"><label>DESCRIPTION</label><textarea id="e-desc" placeholder="Describe the event..."></textarea></div>
             <div class="fg2">
-              <div class="fg"><label>DATE</label><input id="e-date" placeholder="Mar 31, 2026"/></div>
+              <div class="fg"><label>DISPLAY DATE</label><input id="e-date" placeholder="Mar 31, 2026"/></div>
               <div class="fg"><label>PRIZES (comma separated)</label><input id="e-prizes" placeholder="$10 Nitro, Nitro Basic, 200 RBX"/></div>
+            </div>
+            <div class="fg2">
+              <div class="fg"><label>START DATE</label><input type="datetime-local" id="e-start"/></div>
+              <div class="fg"><label>END DATE</label><input type="datetime-local" id="e-end"/></div>
             </div>
             <div class="form-row"><button class="btn btn-blue" onclick="addEvent()">Add Event</button></div>
           </div>
@@ -963,15 +967,36 @@ function rEV(){
     var pz='';
     for(var j=0;j<e.prizes.length;j++){
       var pc=j===0?'pg1':j===1?'ps2':j===2?'pb3':'chip';
-      pz+='<span class="pill '+pc+'">'+e.prizes[j]+'</span>';
+      var medal=j===0?'🥇':j===1?'🥈':j===2?'🥉':'';
+      pz+='<span class="pill '+pc+'">'+medal+' '+e.prizes[j]+'</span>';
     }
     var sdot=e.status==='live'?'<span class="dot live" style="display:inline-block;width:5px;height:5px;"></span>':'';
+    var dateStr='';
+    if(e.start_date||e.end_date){
+      var opts={day:'numeric',month:'short',year:'numeric'};
+      if(e.start_date) dateStr+='<span style="font-size:11px;color:var(--text2);">Starts: <strong style="color:var(--text);">'+new Date(e.start_date).toLocaleDateString('en-GB',opts)+'</strong></span>';
+      if(e.end_date) dateStr+='<span style="font-size:11px;color:var(--text2);margin-left:10px;">Ends: <strong style="color:var(--text);">'+new Date(e.end_date).toLocaleDateString('en-GB',opts)+'</strong></span>';
+    } else {
+      dateStr='<span style="font-size:11px;color:var(--text2);">Date: <strong style="color:var(--text);">'+e.date+'</strong></span>';
+    }
+    // countdown
+    var countdown='';
+    if(e.end_date&&e.status==='live'){
+      var diff=new Date(e.end_date)-new Date();
+      if(diff>0){
+        var days=Math.floor(diff/86400000);
+        var hrs=Math.floor((diff%86400000)/3600000);
+        var mins=Math.floor((diff%3600000)/60000);
+        countdown='<div style="background:var(--accent-dim);border:1px solid var(--accent-border);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--accent-l);margin-top:4px;">⏱ '+days+'d '+hrs+'h '+mins+'m remaining</div>';
+      }
+    }
     html+='<div class="ev-card'+(e.status==='live'?' live':'')+'">'+
       '<span class="status '+sM[e.status]+'">'+sdot+lM[e.status]+'</span>'+
       '<div class="ev-title">'+e.title+'</div>'+
       '<div class="ev-desc">'+e.desc+'</div>'+
-      '<div class="ev-meta">Date <strong>'+e.date+'</strong></div>'+
-      (pz?'<div class="prizes">'+pz+'</div>':'')+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;">'+dateStr+'</div>'+
+      countdown+
+      (pz?'<div class="prizes" style="padding-top:10px;border-top:1px solid var(--b1);">'+pz+'</div>':'')+
       '</div>';
   }
   document.getElementById('ev-rows').innerHTML=html||'<div class="empty">No events yet.</div>';
@@ -1146,11 +1171,13 @@ function addEvent(){
   var dt=document.getElementById('e-date').value.trim()||'TBA';
   var pr=document.getElementById('e-prizes').value.trim();
   var prizes=pr?pr.split(',').map(function(p){return p.trim();}).filter(Boolean):[];
+  var start=document.getElementById('e-start').value||null;
+  var end=document.getElementById('e-end').value||null;
   if(!t){toast('Fill in event title!','err');return;}
-  fetch(API+'/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,status:st,description:d,date:dt,prizes:prizes})})
+  fetch(API+'/events',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title:t,status:st,description:d,date:dt,prizes:prizes,start_date:start,end_date:end})})
   .then(function(){
-    D.events.unshift({id:Date.now(),title:t,status:st,desc:d,date:dt,prizes:prizes});
-    ['e-title','e-desc','e-date','e-prizes'].forEach(function(x){document.getElementById(x).value='';});
+    D.events.unshift({id:Date.now(),title:t,status:st,desc:d,date:dt,prizes:prizes,start_date:start,end_date:end});
+    ['e-title','e-desc','e-date','e-prizes','e-start','e-end'].forEach(function(x){document.getElementById(x).value='';});
     rEvTbl();
     toast('Event "'+t+'" added!');
   }).catch(function(){toast('Failed to save!','err');});
@@ -1272,7 +1299,7 @@ fetch(API+'/leaderboard').then(function(r){return r.json();}).then(function(data
 fetch(API+'/stats').then(function(r){return r.json();}).then(function(data){document.getElementById('s-inv').textContent=data.total_invites;document.getElementById('s-mem').textContent=data.active_inviters;document.getElementById('s-clm').textContent=data.rewards_claimed;}).catch(function(){});
 fetch(API+'/shop').then(function(r){return r.json();}).then(function(data){D.items=data.map(function(i){return {id:i.id,name:i.name,desc:i.description,cost:i.cost,stock:i.stock,icon:i.icon||'🎁',active:true};});}).catch(function(){});
 fetch(API+'/events').then(function(r){return r.json();}).then(function(data){
-  D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]')};});
+  D.events=data.map(function(e){return {id:e.id,title:e.title,status:e.status,desc:e.description,date:e.date,prizes:JSON.parse(e.prizes||'[]'),start_date:e.start_date,end_date:e.end_date};});
   rEV();
   loadHeroRotator();
 }).catch(function(){});
